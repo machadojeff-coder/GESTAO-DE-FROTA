@@ -1,0 +1,3597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="dashboard">
+  <meta name="design-style" content="aurora">
+  <title>Gestão de Frota • 23º Batalhão de Polícia Militar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+
+      /* 1. Base Aurora adaptada para tons táticos de azul-marinho profundo e grafite/ardósia */
+      --background: #080e1a;
+      --surface-container-low: #0d1526;
+      --surface-container: #131d31;
+      --surface-container-high: #1a2740;
+
+      /* Texto de alto contraste */
+      --on-surface: #f1f5f9;
+      --on-surface-variant: #9fb0c7;
+
+      /* Bordas e divisores */
+      --outline: #3b5070;
+      --outline-variant: #213049;
+
+      /* Acentos táticos e institucionais */
+      --primary: #38bdf8;
+      --on-primary: #06131f;
+      --primary-container: #10324d;
+      --on-primary-container: #bae6fd;
+      --secondary: #647b99;
+      --tertiary: #4ade80;
+      --on-tertiary: #041c0d;
+      --error: #f87171;
+      --on-error: #240606;
+
+      /* Semântica operacional */
+      --positive: #4ade80;
+      --warning: #fbbf24;
+      --on-warning: #211502;
+      --info: #60a5fa;
+      --on-info: #061326;
+      --orange: #fb923c;
+
+      /* Séries de dados */
+      --data-1: #38bdf8;
+      --data-2: #4ade80;
+      --data-3: #fbbf24;
+      --data-4: #f87171;
+      --data-context: #475d7d;
+
+      /* Fontes */
+      --font-headline: 'Instrument Sans', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-label: 'Geist Mono', monospace;
+
+      /* Formas */
+      --rounded: 0.5rem;
+      --rounded-lg: 0.75rem;
+      --rounded-full: 9999px;
+
+      /* Efeitos e gradientes táticos */
+      --hairline: 1px solid var(--outline-variant);
+      --hairline-strong: 1px solid var(--outline);
+      --panel-gradient: linear-gradient(180deg, #162238 0%, #0f1829 100%);
+      --header-gradient: linear-gradient(135deg, #0d172b 0%, #111c30 60%, #0a1222 100%);
+      --heading-tracking: -0.025em;
+      --label-tracking: 0.06em;
+
+      --cyan-tint: color-mix(in srgb, var(--primary) 14%, transparent);
+      --sage-tint: color-mix(in srgb, var(--positive) 14%, transparent);
+      --amber-tint: color-mix(in srgb, var(--warning) 15%, transparent);
+      --orange-tint: color-mix(in srgb, var(--orange) 15%, transparent);
+      --red-tint: color-mix(in srgb, var(--error) 16%, transparent);
+      --blue-tint: color-mix(in srgb, var(--info) 15%, transparent);
+      --backdrop-scrim: rgba(4, 8, 16, 0.84);
+
+      /* Foco */
+      --focus: var(--primary);
+
+      /* Escala tipográfica (Dashboard / Ferramenta Operacional) */
+      --display-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.125rem);
+      --headline-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.45rem);
+      --subhead-size: clamp(1.02rem, 0.98rem + 0.25vw, 1.15rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.12vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Espaçamento (base 4pt) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+
+      /* Movimento */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .app-shell {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-lg);
+      min-height: 100vh;
+      grid-template-rows: auto auto 1fr auto;
+    }
+    .app-shell * { min-width: 0; }
+
+    /* Cabeçalho Institucional */
+    .bpm-header {
+      background: var(--header-gradient);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .bpm-crest {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--rounded);
+      background: var(--primary-container);
+      border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 700;
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.1;
+      margin: 0;
+      color: var(--on-surface);
+    }
+
+    .subtitle {
+      margin: var(--space-xs) 0 0;
+      color: var(--on-surface-variant);
+      font-size: var(--body-size);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Indicador de Sincronização Supabase */
+    .sync-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: 0 var(--space-md);
+      border-radius: var(--rounded);
+      border: var(--hairline-strong);
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .sync-pill:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+    .sync-pill.is-synced {
+      background: var(--sage-tint);
+      color: var(--positive);
+      border-color: color-mix(in srgb, var(--positive) 40%, transparent);
+    }
+    .sync-pill.is-error {
+      background: var(--red-tint);
+      color: var(--error);
+      border-color: color-mix(in srgb, var(--error) 40%, transparent);
+    }
+    .sync-pill.is-syncing {
+      background: var(--cyan-tint);
+      color: var(--primary);
+      border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--rounded-full);
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* Botões */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: 0 var(--space-md);
+      border-radius: var(--rounded);
+      border: var(--hairline-strong);
+      background: var(--surface-container);
+      color: var(--on-surface);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: var(--body-size);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--surface-container-high);
+    }
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: transparent;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--primary) 88%, var(--on-surface));
+    }
+
+    .btn-success {
+      background: var(--positive);
+      color: var(--on-tertiary);
+      border-color: transparent;
+    }
+    .btn-success:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--positive) 88%, var(--on-surface));
+    }
+
+    .btn-warning {
+      background: var(--amber-tint);
+      color: var(--warning);
+      border-color: color-mix(in srgb, var(--warning) 45%, transparent);
+    }
+    .btn-warning:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--warning) 24%, transparent);
+    }
+
+    .btn-danger {
+      background: var(--red-tint);
+      color: var(--error);
+      border-color: color-mix(in srgb, var(--error) 45%, transparent);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--error) 25%, transparent);
+    }
+
+    .btn-admin-active {
+      background: var(--amber-tint);
+      color: var(--warning);
+      border-color: color-mix(in srgb, var(--warning) 50%, transparent);
+    }
+
+    .btn-sm {
+      min-height: 38px;
+      padding: 0 var(--space-sm);
+      font-size: 0.875rem;
+    }
+
+    /* Navegação Principal */
+    .nav-rail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-sm);
+    }
+
+    .nav-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: 0 var(--space-md);
+      border-radius: var(--rounded);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--on-surface-variant);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+    .nav-tab:hover {
+      background: var(--surface-container);
+      color: var(--on-surface);
+    }
+    .nav-tab.is-active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+    }
+
+    .nav-count {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      padding: 1px 6px;
+      border-radius: var(--rounded-full);
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+    .nav-count.has-alert {
+      background: var(--red-tint);
+      color: var(--error);
+    }
+
+    /* Painéis */
+    .panel {
+      background: var(--panel-gradient);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 600;
+      letter-spacing: var(--heading-tracking);
+      margin: 0;
+      color: var(--on-surface);
+    }
+
+    .section-desc {
+      margin: var(--space-xs) 0 0;
+      color: var(--on-surface-variant);
+      font-size: var(--body-size);
+    }
+
+    .data-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
+
+    /* View Switching */
+    .view-section {
+      display: none;
+      gap: var(--space-lg);
+    }
+    .view-section.is-active {
+      display: grid;
+    }
+
+    /* KPI Strip (5 status filtráveis + Todos) */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+
+    .kpi-card {
+      text-align: left;
+      background: var(--panel-gradient);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+      cursor: pointer;
+      display: grid;
+      gap: var(--space-xs);
+      transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+      min-height: 92px;
+    }
+    .kpi-card:hover {
+      background: var(--surface-container-high);
+      transform: translateY(-1px);
+    }
+    .kpi-card.is-selected {
+      box-shadow: 0 0 0 2px var(--primary);
+      background: var(--surface-container-high);
+    }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-xs);
+    }
+
+    .kpi-value {
+      font-family: var(--font-headline);
+      font-size: clamp(1.6rem, 1.3rem + 0.9vw, 2rem);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      color: var(--on-surface);
+    }
+
+    .kpi-accent-all { color: var(--primary); }
+    .kpi-accent-disp { color: var(--positive); }
+    .kpi-accent-patr { color: var(--info); }
+    .kpi-accent-viag { color: var(--warning); }
+    .kpi-accent-manu { color: var(--orange); }
+    .kpi-accent-baix { color: var(--error); }
+
+    /* Barra de Filtros */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: var(--space-md);
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+    }
+
+    .field {
+      display: grid;
+      gap: var(--space-xs);
+      flex: 1 1 200px;
+    }
+
+    .field-compact {
+      flex: 0 1 220px;
+    }
+
+    label.field-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      font-weight: 500;
+    }
+
+    .input, .select, .textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--background);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+      transition: box-shadow var(--dur-micro) var(--ease-out);
+    }
+    .select {
+      padding-right: var(--space-xl);
+    }
+    .textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .input::placeholder, .textarea::placeholder {
+      color: var(--secondary);
+    }
+
+    /* Grid de Viaturas */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+      gap: var(--space-lg);
+    }
+
+    .vtr-card-wrap {
+      container-type: inline-size;
+    }
+
+    .vtr-card {
+      background: var(--panel-gradient);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .vtr-card.has-parte {
+      border-color: color-mix(in srgb, var(--error) 55%, transparent);
+    }
+
+    .vtr-media {
+      position: relative;
+      height: 185px;
+      background: var(--background);
+      border-bottom: var(--hairline);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .vtr-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .vtr-placeholder {
+      display: grid;
+      place-items: center;
+      gap: var(--space-xs);
+      color: var(--secondary);
+      text-align: center;
+      padding: var(--space-md);
+    }
+
+    .vtr-media-badges {
+      position: absolute;
+      top: var(--space-sm);
+      left: var(--space-sm);
+      right: var(--space-sm);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-xs);
+      pointer-events: none;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      backdrop-filter: blur(6px);
+      pointer-events: auto;
+    }
+    .status-disp {
+      background: var(--sage-tint);
+      color: var(--positive);
+      border: 1px solid color-mix(in srgb, var(--positive) 45%, transparent);
+    }
+    .status-patr {
+      background: var(--blue-tint);
+      color: var(--info);
+      border: 1px solid color-mix(in srgb, var(--info) 45%, transparent);
+    }
+    .status-viag {
+      background: var(--amber-tint);
+      color: var(--warning);
+      border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+    }
+    .status-manu {
+      background: var(--orange-tint);
+      color: var(--orange);
+      border: 1px solid color-mix(in srgb, var(--orange) 45%, transparent);
+    }
+    .status-baix {
+      background: var(--red-tint);
+      color: var(--error);
+      border: 1px solid color-mix(in srgb, var(--error) 55%, transparent);
+    }
+
+    .parte-alert-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: var(--rounded);
+      background: var(--error);
+      color: var(--on-error);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .vtr-body {
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-md);
+      flex: 1;
+    }
+
+    .vtr-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+
+    .vtr-prefix {
+      font-family: var(--font-headline);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: var(--heading-tracking);
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .vtr-plate {
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      padding: 2px 8px;
+      border-radius: var(--rounded);
+      background: var(--background);
+      border: var(--hairline-strong);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .vtr-model {
+      color: var(--on-surface-variant);
+      font-size: var(--body-size);
+      margin: 2px 0 0;
+    }
+
+    .vtr-specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-sm);
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+    }
+
+    .spec-item {
+      display: grid;
+      gap: 2px;
+    }
+
+    .spec-val {
+      font-family: var(--font-label);
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--on-surface);
+    }
+
+    .vtr-active-turn {
+      background: var(--blue-tint);
+      border: 1px solid color-mix(in srgb, var(--info) 35%, transparent);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.875rem;
+      color: var(--on-surface);
+      display: grid;
+      gap: 2px;
+    }
+
+    .vtr-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      border-top: var(--hairline);
+      background: var(--surface-container-low);
+    }
+    .vtr-actions .btn {
+      flex: 1 1 auto;
+    }
+
+    /* Empty State */
+    .empty-state {
+      background: var(--surface-container-low);
+      border: 1px dashed var(--outline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-2xl) var(--space-lg);
+      text-align: center;
+      display: grid;
+      justify-items: center;
+      gap: var(--space-md);
+    }
+    .empty-state-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--rounded-full);
+      background: var(--primary-container);
+      color: var(--primary);
+      display: grid;
+      place-items: center;
+    }
+    .empty-state h3 {
+      margin: 0;
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+    }
+    .empty-state p {
+      margin: 0;
+      max-width: 58ch;
+      color: var(--on-surface-variant);
+    }
+
+    /* Layouts de Formulário 2 Colunas */
+    .split-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    /* Cautela & Checklist G.A.L.O.P.E. */
+    .sub-tabs {
+      display: inline-flex;
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: 4px;
+      gap: 4px;
+    }
+    .sub-tab {
+      min-height: 40px;
+      padding: 0 var(--space-md);
+      border-radius: calc(var(--rounded) - 2px);
+      border: none;
+      background: transparent;
+      color: var(--on-surface-variant);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .sub-tab.is-active {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .galope-list {
+      display: grid;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+    }
+
+    .galope-item {
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .galope-item.is-critical {
+      border-color: var(--error);
+      background: color-mix(in srgb, var(--error) 8%, var(--background));
+    }
+
+    .galope-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-xs);
+    }
+
+    .galope-letter {
+      display: inline-grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: var(--rounded);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      font-family: var(--font-label);
+      font-weight: 600;
+      margin-right: var(--space-xs);
+    }
+
+    .galope-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+
+    .galope-desc {
+      font-size: 0.85rem;
+      color: var(--on-surface-variant);
+    }
+
+    .galope-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+
+    .galope-opt-btn {
+      min-height: 42px;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      border: var(--hairline-strong);
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+    .galope-opt-btn:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+    .galope-opt-btn.selected-ok {
+      background: var(--sage-tint);
+      color: var(--positive);
+      border-color: color-mix(in srgb, var(--positive) 55%, transparent);
+    }
+    .galope-opt-btn.selected-warn {
+      background: var(--amber-tint);
+      color: var(--warning);
+      border-color: color-mix(in srgb, var(--warning) 55%, transparent);
+    }
+    .galope-opt-btn.selected-crit {
+      background: var(--error);
+      color: var(--on-error);
+      border-color: var(--error);
+    }
+
+    /* Alertas Inline */
+    .alert-box {
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      border: 1px solid transparent;
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .alert-critical {
+      background: var(--red-tint);
+      border-color: var(--error);
+      color: var(--on-surface);
+    }
+    .alert-critical-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--error);
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .alert-info {
+      background: var(--cyan-tint);
+      border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+      color: var(--on-surface);
+    }
+    .alert-success {
+      background: var(--sage-tint);
+      border-color: color-mix(in srgb, var(--positive) 45%, transparent);
+      color: var(--positive);
+    }
+    .alert-warn {
+      background: var(--amber-tint);
+      border-color: color-mix(in srgb, var(--warning) 45%, transparent);
+      color: var(--warning);
+    }
+
+    /* Destaque KM Rodados na Descautela */
+    .km-highlight-box {
+      background: var(--background);
+      border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    .km-highlight-number {
+      font-family: var(--font-headline);
+      font-size: 2rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--primary);
+    }
+
+    /* Tabelas */
+    .table-scroll {
+      overflow-x: auto;
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      background: var(--background);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    table.data-table th {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--hairline-strong);
+      background: var(--surface-container-low);
+      white-space: nowrap;
+    }
+    table.data-table td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--hairline);
+      color: var(--on-surface);
+      vertical-align: middle;
+    }
+    table.data-table tr:last-child td {
+      border-bottom: none;
+    }
+    .num-cell {
+      font-family: var(--font-label);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* Upload de Arquivo Estilizado */
+    .file-drop-box {
+      background: var(--background);
+      border: 1px dashed var(--outline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .photo-preview-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-md);
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-sm);
+    }
+    .photo-preview-box img {
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: calc(var(--rounded) - 2px);
+      border: var(--hairline);
+    }
+
+    /* Código SQL */
+    .sql-block {
+      background: var(--background);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      line-height: 1.55;
+      color: var(--on-primary-container);
+      overflow-x: auto;
+      white-space: pre;
+      margin: 0;
+    }
+
+    /* Lista de Partes / Histórico */
+    .history-stack {
+      display: grid;
+      gap: var(--space-md);
+    }
+    .history-card {
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .history-card-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Modal de Visualização de Anexo */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: var(--backdrop-scrim);
+      display: none;
+      place-items: center;
+      padding: var(--space-lg);
+      z-index: 50;
+    }
+    .modal-backdrop.is-open {
+      display: grid;
+    }
+    .modal-dialog {
+      width: min(880px, 100%);
+      max-height: 90vh;
+      background: var(--surface-container);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded-lg);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+    }
+    .modal-head {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    .modal-body {
+      padding: var(--space-lg);
+      overflow: auto;
+      display: grid;
+      place-items: center;
+      background: var(--background);
+      min-height: 320px;
+    }
+    .modal-body img {
+      max-width: 100%;
+      max-height: 68vh;
+      border-radius: var(--rounded);
+    }
+    .modal-body iframe {
+      width: 100%;
+      height: 65vh;
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+    }
+    .modal-foot {
+      padding: var(--space-md) var(--space-lg);
+      border-top: var(--hairline);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-sm);
+    }
+
+    /* Toast de Feedback Inline */
+    .toast-region {
+      position: fixed;
+      bottom: var(--space-lg);
+      right: var(--space-lg);
+      z-index: 60;
+      display: grid;
+      gap: var(--space-sm);
+      max-width: min(420px, calc(100vw - 2rem));
+      pointer-events: none;
+    }
+    .toast-item {
+      pointer-events: auto;
+      background: var(--surface-container-high);
+      border: var(--hairline-strong);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      color: var(--on-surface);
+      font-size: 0.9rem;
+    }
+    .toast-item.is-error { border-left-color: var(--error); }
+    .toast-item.is-success { border-left-color: var(--positive); }
+    .toast-item.is-warn { border-left-color: var(--warning); }
+
+    /* Rodapé Institucional Discreto */
+    .bpm-footer {
+      border-top: var(--hairline);
+      padding-top: var(--space-md);
+      text-align: center;
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+    }
+
+    .is-hidden { display: none !important; }
+
+    /* Container queries para cards */
+    @container (max-width: 320px) {
+      .vtr-specs { grid-template-columns: 1fr; }
+    }
+
+    /* Responsividade Tablet e Smartphone */
+    @media (max-width: 960px) {
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        padding: var(--space-sm);
+        gap: var(--space-md);
+      }
+      .bpm-header, .panel {
+        padding: var(--space-md);
+      }
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .galope-options {
+        grid-template-columns: 1fr;
+      }
+      .nav-rail {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .nav-tab {
+        justify-content: center;
+        text-align: center;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.875rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Cabeçalho -->
+    <header class="bpm-header">
+      <div class="brand-block">
+        <div class="bpm-crest" aria-hidden="true">
+          <i data-lucide="shield"></i>
+        </div>
+        <div>
+          <h1 class="title">Gestão de Frota • 23º BPM</h1>
+          <p class="subtitle">Prontidão Operacional, Diário de Bordo (G.A.L.O.P.E.) e Registro de Alterações</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" id="btn-sync-indicator" class="sync-pill" onclick="handleSyncIndicatorClick()">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="sync-status-text">Modo Local</span>
+        </button>
+        <button type="button" id="btn-admin-header" class="btn" onclick="switchView('admin')">
+          <i data-lucide="lock" aria-hidden="true"></i>
+          <span id="admin-header-label">Modo Administrador</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Barra de Navegação -->
+    <nav class="nav-rail" aria-label="Módulos Operacionais">
+      <button type="button" id="nav-dashboard" class="nav-tab is-active" onclick="switchView('dashboard')">
+        <i data-lucide="layout-grid" aria-hidden="true"></i>
+        <span>Prontidão Operacional</span>
+        <span id="badge-total-vtrs" class="nav-count">0</span>
+      </button>
+      <button type="button" id="nav-cautela" class="nav-tab" onclick="switchView('cautela')">
+        <i data-lucide="clipboard-check" aria-hidden="true"></i>
+        <span>Cautela &amp; Descautela</span>
+      </button>
+      <button type="button" id="nav-aux" class="nav-tab" onclick="switchView('aux')">
+        <i data-lucide="file-warning" aria-hidden="true"></i>
+        <span>Aux. Serviço Externo</span>
+        <span id="badge-partes-pendentes" class="nav-count">0</span>
+      </button>
+      <button type="button" id="nav-admin" class="nav-tab" onclick="switchView('admin')">
+        <i data-lucide="settings" aria-hidden="true"></i>
+        <span>Administrador (P4)</span>
+      </button>
+    </nav>
+
+    <main>
+      <!-- VIEW 1: DASHBOARD DE PRONTIDÃO OPERACIONAL -->
+      <section id="view-dashboard" class="view-section is-active" aria-labelledby="heading-dashboard">
+        <div class="kpi-strip" role="group" aria-label="Filtro por Status Operacional">
+          <button type="button" id="kpi-todas" class="kpi-card is-selected" onclick="setStatusFilter('Todas')">
+            <div class="kpi-top">
+              <span class="data-label">Frota Total</span>
+              <i data-lucide="car" class="kpi-accent-all" aria-hidden="true"></i>
+            </div>
+            <div id="count-todas" class="kpi-value kpi-accent-all">0</div>
+          </button>
+
+          <button type="button" id="kpi-disponivel" class="kpi-card" onclick="setStatusFilter('Disponível')">
+            <div class="kpi-top">
+              <span class="data-label">Disponíveis</span>
+              <i data-lucide="check-circle-2" class="kpi-accent-disp" aria-hidden="true"></i>
+            </div>
+            <div id="count-disponivel" class="kpi-value kpi-accent-disp">0</div>
+          </button>
+
+          <button type="button" id="kpi-patrulhamento" class="kpi-card" onclick="setStatusFilter('Em Patrulhamento')">
+            <div class="kpi-top">
+              <span class="data-label">Em Patrulhamento</span>
+              <i data-lucide="radio" class="kpi-accent-patr" aria-hidden="true"></i>
+            </div>
+            <div id="count-patrulhamento" class="kpi-value kpi-accent-patr">0</div>
+          </button>
+
+          <button type="button" id="kpi-viagem" class="kpi-card" onclick="setStatusFilter('Em Viagem')">
+            <div class="kpi-top">
+              <span class="data-label">Em Viagem</span>
+              <i data-lucide="navigation" class="kpi-accent-viag" aria-hidden="true"></i>
+            </div>
+            <div id="count-viagem" class="kpi-value kpi-accent-viag">0</div>
+          </button>
+
+          <button type="button" id="kpi-manutencao" class="kpi-card" onclick="setStatusFilter('Em Manutenção')">
+            <div class="kpi-top">
+              <span class="data-label">Em Manutenção</span>
+              <i data-lucide="wrench" class="kpi-accent-manu" aria-hidden="true"></i>
+            </div>
+            <div id="count-manutencao" class="kpi-value kpi-accent-manu">0</div>
+          </button>
+
+          <button type="button" id="kpi-baixada" class="kpi-card" onclick="setStatusFilter('Baixada')">
+            <div class="kpi-top">
+              <span class="data-label">Baixadas</span>
+              <i data-lucide="alert-octagon" class="kpi-accent-baix" aria-hidden="true"></i>
+            </div>
+            <div id="count-baixada" class="kpi-value kpi-accent-baix">0</div>
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="field">
+            <label for="dash-search" class="field-label">Buscar Viatura (Prefixo, Modelo, Placa ou Subunidade)</label>
+            <input type="text" id="dash-search" class="input" placeholder="Ex.: VTR-2301, Hilux, P4…" oninput="renderDashboard()">
+          </div>
+          <div class="field field-compact">
+            <label for="dash-subunidade" class="field-label">Subunidade / Pelotão</label>
+            <select id="dash-subunidade" class="select" onchange="renderDashboard()">
+              <option value="">Todas as Subunidades</option>
+            </select>
+          </div>
+          <div class="field field-compact">
+            <label for="dash-parte-filter" class="field-label">Alertas de Alteração</label>
+            <select id="dash-parte-filter" class="select" onchange="renderDashboard()">
+              <option value="">Todas as Viaturas</option>
+              <option value="pendente">Apenas com Parte Pendente</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="dashboard-grid" class="card-grid"></div>
+        <div id="dashboard-empty" class="empty-state is-hidden">
+          <div class="empty-state-icon" aria-hidden="true">
+            <i data-lucide="shield-check"></i>
+          </div>
+          <h3 id="empty-state-title">Base Operacional Limpa</h3>
+          <p id="empty-state-desc">Nenhuma viatura cadastrada no sistema até o momento. Acesse o Modo Administrador (P4) para incluir viaturas individualmente ou importar sua frota diretamente de uma planilha Excel ou Google Planilhas.</p>
+          <button type="button" class="btn btn-primary" onclick="switchView('admin')">
+            <i data-lucide="plus-circle" aria-hidden="true"></i>
+            <span>Cadastrar Viaturas no Modo Administrador</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW 2: CAUTELA E DESCAUTELA DE VIATURA (DIÁRIO DE BORDO) -->
+      <section id="view-cautela" class="view-section" aria-labelledby="heading-cautela">
+        <div class="panel">
+          <div class="section-header">
+            <div>
+              <h2 id="heading-cautela" class="section-title">Diário de Bordo — Cautela e Descautela</h2>
+              <p class="section-desc">Inspeção obrigatória G.A.L.O.P.E. na saída e apuração de quilometragem rodada no encerramento do turno.</p>
+            </div>
+            <div class="sub-tabs" role="tablist" aria-label="Operação do Diário de Bordo">
+              <button type="button" id="tab-btn-cautela" class="sub-tab is-active" onclick="setCautelaMode('cautela')">Cautela (Saída)</button>
+              <button type="button" id="tab-btn-descautela" class="sub-tab" onclick="setCautelaMode('descautela')">Descautela (Retorno)</button>
+            </div>
+          </div>
+
+          <div class="split-grid">
+            <!-- Coluna Esquerda: Formulário Ativo -->
+            <div>
+              <!-- SUBMODO CAUTELA -->
+              <div id="pane-cautela">
+                <form id="form-cautela" onsubmit="submitCautela(event)">
+                  <div class="form-grid-2">
+                    <div class="field">
+                      <label for="cautela-vtr" class="field-label">Viatura (Disponível)</label>
+                      <select id="cautela-vtr" class="select" required onchange="onCautelaVtrChange()">
+                        <option value="">Selecione uma viatura…</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="cautela-modalidade" class="field-label">Status de Destino da Missão</label>
+                      <select id="cautela-modalidade" class="select" required>
+                        <option value="Em Patrulhamento">Em Patrulhamento</option>
+                        <option value="Em Viagem">Em Viagem</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="cautela-motorista" class="field-label">Posto/Grad e Motorista</label>
+                      <input type="text" id="cautela-motorista" class="input" required placeholder="Ex.: Sd PM Rodrigues">
+                    </div>
+                    <div class="field">
+                      <label for="cautela-matricula" class="field-label">Matrícula / ID Funcional</label>
+                      <input type="text" id="cautela-matricula" class="input" required placeholder="Ex.: 4512890">
+                    </div>
+                    <div class="field">
+                      <label for="cautela-guarnicao" class="field-label">Comandante / Guarnição</label>
+                      <input type="text" id="cautela-guarnicao" class="input" placeholder="Ex.: 2º Sgt Almeida / Sd Costa">
+                    </div>
+                    <div class="field">
+                      <label for="cautela-setor" class="field-label">Setor / Subunidade de Emprego</label>
+                      <input type="text" id="cautela-setor" class="input" required placeholder="Ex.: 1ª Cia — Área Central">
+                    </div>
+                    <div class="field">
+                      <label for="cautela-km-inicial" class="field-label">Odômetro Inicial (KM)</label>
+                      <input type="number" id="cautela-km-inicial" class="input" min="0" required placeholder="0">
+                    </div>
+                    <div class="field">
+                      <label for="cautela-obs" class="field-label">Observações / Ressalvas</label>
+                      <input type="text" id="cautela-obs" class="input" placeholder="Opcional">
+                    </div>
+                  </div>
+
+                  <div style="margin-top: var(--space-lg);">
+                    <div class="galope-head">
+                      <span class="data-label">Checklist Obrigatório G.A.L.O.P.E.</span>
+                      <span class="galope-desc">Padrão "OK" para itens conformes</span>
+                    </div>
+                    <div id="galope-container" class="galope-list"></div>
+                  </div>
+
+                  <!-- Alerta Crítico de Bloqueio G.A.L.O.P.E. -->
+                  <div id="galope-critical-alert" class="alert-box alert-critical is-hidden" style="margin-top: var(--space-md);" role="alert">
+                    <div class="alert-critical-title">
+                      <i data-lucide="octagon-alert" aria-hidden="true"></i>
+                      <span>BLOQUEIO OPERACIONAL — VIATURA BAIXADA AUTOMATICAMENTE</span>
+                    </div>
+                    <p id="galope-critical-msg" style="margin: 0;">Foi registrada Avaria Alta / Inoperante no checklist G.A.L.O.P.E. A conclusão da cautela foi bloqueada e o status da viatura foi alterado para <strong>Baixada</strong>. Realize a troca imediata por outra viatura disponível no pátio.</p>
+                    <div>
+                      <button type="button" class="btn btn-primary btn-sm" onclick="goToAvailableVtrs()">
+                        <i data-lucide="arrow-right" aria-hidden="true"></i>
+                        <span>Selecionar Outra Viatura Disponível</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div id="cautela-form-msg" style="margin-top: var(--space-md);"></div>
+
+                  <div class="form-actions">
+                    <button type="submit" id="btn-submit-cautela" class="btn btn-primary">
+                      <i data-lucide="key-round" aria-hidden="true"></i>
+                      <span>Concluir Cautela e Assumir Turno</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- SUBMODO DESCAUTELA -->
+              <div id="pane-descautela" class="is-hidden">
+                <form id="form-descautela" onsubmit="submitDescautela(event)">
+                  <div class="form-grid-2">
+                    <div class="field" style="grid-column: 1 / -1;">
+                      <label for="descautela-vtr" class="field-label">Viatura em Turno (Em Patrulhamento ou Em Viagem)</label>
+                      <select id="descautela-vtr" class="select" required onchange="onDescautelaVtrChange()">
+                        <option value="">Selecione a viatura para encerrar turno…</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div id="descautela-turno-info" class="alert-box alert-info is-hidden" style="margin-top: var(--space-md);"></div>
+
+                  <div class="form-grid-2" style="margin-top: var(--space-md);">
+                    <div class="field">
+                      <label for="descautela-km-final" class="field-label">Odômetro Final no Retorno (KM)</label>
+                      <input type="number" id="descautela-km-final" class="input" min="0" required placeholder="Informe o KM final" oninput="updateKmRodadosPreview()">
+                    </div>
+                    <div class="field">
+                      <label for="descautela-status-retorno" class="field-label">Condição no Encerramento</label>
+                      <select id="descautela-status-retorno" class="select">
+                        <option value="Disponível">Sem alterações — Retornar para Disponível</option>
+                        <option value="Em Manutenção">Com alteração mecânica — Enviar para Manutenção</option>
+                        <option value="Baixada">Inoperante — Baixar Viatura</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="descautela-abastecimento" class="field-label">Abastecimento no Turno (Litros, se houver)</label>
+                      <input type="number" id="descautela-abastecimento" class="input" min="0" step="0.1" placeholder="0.0">
+                    </div>
+                    <div class="field">
+                      <label for="descautela-obs" class="field-label">Observações do Retorno</label>
+                      <input type="text" id="descautela-obs" class="input" placeholder="Relato breve do turno">
+                    </div>
+                  </div>
+
+                  <!-- Destaque de KM Rodados no Turno -->
+                  <div id="descautela-km-box" class="km-highlight-box" style="margin-top: var(--space-md);">
+                    <div>
+                      <div class="data-label">Quilometragem Percorrida no Turno</div>
+                      <div id="descautela-km-detail" style="color: var(--on-surface-variant); font-size: 0.875rem;">Selecione a viatura e informe o odômetro final</div>
+                    </div>
+                    <div id="descautela-km-delta" class="km-highlight-number">— km</div>
+                  </div>
+
+                  <div id="descautela-form-msg" style="margin-top: var(--space-md);"></div>
+
+                  <div class="form-actions">
+                    <button type="submit" id="btn-submit-descautela" class="btn btn-success">
+                      <i data-lucide="check-square" aria-hidden="true"></i>
+                      <span>Concluir Descautela e Registrar KM</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Coluna Direita: Histórico do Diário de Bordo -->
+            <div>
+              <div class="section-header" style="margin-bottom: var(--space-md);">
+                <div>
+                  <h3 class="section-title" style="font-size: var(--subhead-size);">Registros do Diário de Bordo</h3>
+                  <p class="section-desc">Últimas movimentações de saída, retorno e bloqueios G.A.L.O.P.E.</p>
+                </div>
+              </div>
+              <div id="cautela-history-list" class="history-stack"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: MÓDULO AUXILIAR DE SERVIÇO EXTERNO -->
+      <section id="view-aux" class="view-section" aria-labelledby="heading-aux">
+        <div class="panel">
+          <div class="section-header">
+            <div>
+              <h2 id="heading-aux" class="section-title">Auxiliar de Serviço Externo — Parte de Alterações</h2>
+              <p class="section-desc">Comunicação formal de avarias, sinistros ou pendências em viatura, com anexo de documento PDF ou imagem do dispositivo.</p>
+            </div>
+          </div>
+
+          <div class="split-grid">
+            <!-- Formulário de Parte de Alterações -->
+            <form id="form-parte" onsubmit="submitParte(event)">
+              <div class="form-grid-2">
+                <div class="field">
+                  <label for="parte-vtr" class="field-label">Prefixo da Viatura</label>
+                  <select id="parte-vtr" class="select" required>
+                    <option value="">Selecione a viatura…</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="parte-militar" class="field-label">Militar Comunicante</label>
+                  <input type="text" id="parte-militar" class="input" required placeholder="Ex.: 3º Sgt PM Ferreira (Aux. Serv. Ext.)">
+                </div>
+                <div class="field" style="grid-column: 1 / -1;">
+                  <label for="parte-tipo" class="field-label">Tipo de Alteração</label>
+                  <select id="parte-tipo" class="select" required>
+                    <option value="Avaria Mecânica">Avaria Mecânica</option>
+                    <option value="Avaria Elétrica / Giroflex / Sirene">Avaria Elétrica / Giroflex / Sirene</option>
+                    <option value="Sinistro / Avaria de Lataria">Sinistro / Avaria de Lataria</option>
+                    <option value="Pneus / Suspensão / Freios">Pneus / Suspensão / Freios</option>
+                    <option value="Equipamento / Rádio / Cela">Equipamento / Rádio / Cela</option>
+                    <option value="Documentação / Infração">Documentação / Infração</option>
+                    <option value="Outra Alteração Operacional">Outra Alteração Operacional</option>
+                  </select>
+                </div>
+                <div class="field" style="grid-column: 1 / -1;">
+                  <label for="parte-relato" class="field-label">Relato Detalhado da Alteração</label>
+                  <textarea id="parte-relato" class="textarea" required placeholder="Descreva objetivamente a alteração constatada, circunstâncias e providências iniciais…"></textarea>
+                </div>
+                <div class="field" style="grid-column: 1 / -1;">
+                  <label for="parte-arquivo" class="field-label">Anexar Documento ou Foto (PDF, JPG ou PNG do dispositivo)</label>
+                  <div class="file-drop-box">
+                    <input type="file" id="parte-arquivo" accept=".pdf,application/pdf,image/jpeg,image/png" onchange="handleParteFileSelect(event)">
+                    <div id="parte-arquivo-info" class="galope-desc">Nenhum arquivo selecionado. Aceita PDF, JPG ou PNG armazenados no dispositivo.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="parte-form-msg" style="margin-top: var(--space-md);"></div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i data-lucide="file-plus-2" aria-hidden="true"></i>
+                  <span>Registrar Parte de Alterações</span>
+                </button>
+                <button type="button" class="btn" onclick="resetParteForm()">Limpar Campos</button>
+              </div>
+            </form>
+
+            <!-- Histórico de Partes -->
+            <div>
+              <div class="section-header" style="margin-bottom: var(--space-md);">
+                <div>
+                  <h3 class="section-title" style="font-size: var(--subhead-size);">Histórico de Partes</h3>
+                  <p class="section-desc">Visualize ou baixe anexos enviados nas comunicações.</p>
+                </div>
+                <div class="field field-compact">
+                  <label for="parte-filter-status" class="field-label">Filtrar</label>
+                  <select id="parte-filter-status" class="select" onchange="renderPartesHistory()">
+                    <option value="">Todas</option>
+                    <option value="Pendente">Pendentes</option>
+                    <option value="Resolvida">Resolvidas</option>
+                  </select>
+                </div>
+              </div>
+              <div id="partes-history-list" class="history-stack"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: MODO ADMINISTRADOR (P4) -->
+      <section id="view-admin" class="view-section" aria-labelledby="heading-admin">
+        <!-- Tela de Login Admin -->
+        <div id="admin-lock-screen" class="panel" style="max-width: 520px; margin: var(--space-lg) auto; width: 100%;">
+          <div class="section-header">
+            <div>
+              <h2 id="heading-admin" class="section-title">Acesso Restrito — Modo Administrador (P4)</h2>
+              <p class="section-desc">Área exclusiva para inclusão, importação em lote, upload de fotos, exclusão de viaturas e configuração da nuvem.</p>
+            </div>
+          </div>
+          <form id="form-admin-login" onsubmit="unlockAdmin(event)">
+            <div class="field">
+              <label for="admin-password" class="field-label">Senha Administrativa</label>
+              <input type="password" id="admin-password" class="input" required autocomplete="off" placeholder="Digite a senha do Modo Administrador">
+            </div>
+            <div id="admin-login-msg" style="margin-top: var(--space-sm);"></div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <i data-lucide="unlock" aria-hidden="true"></i>
+                <span>Desbloquear Painel P4</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Conteúdo Desbloqueado do Modo Administrador -->
+        <div id="admin-unlocked-content" class="is-hidden" style="display: grid; gap: var(--space-lg);">
+          <div class="panel">
+            <div class="section-header" style="margin-bottom: 0;">
+              <div>
+                <h2 class="section-title">Painel Administrativo da Frota (P4 • 23º BPM)</h2>
+                <p class="section-desc">Gestão patrimonial, cadastro individual ou em lote, fotos das viaturas e sincronização Supabase.</p>
+              </div>
+              <button type="button" class="btn btn-warning" onclick="lockAdmin()">
+                <i data-lucide="lock" aria-hidden="true"></i>
+                <span>Bloquear Modo Administrador</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="split-grid">
+            <!-- Cadastro Unitário + Upload de Foto (sem câmera) -->
+            <div class="panel">
+              <div class="section-header">
+                <div>
+                  <h3 class="section-title" style="font-size: var(--subhead-size);">Incluir Viatura Individual</h3>
+                  <p class="section-desc">Cadastro direto com compressão automática de foto do dispositivo.</p>
+                </div>
+              </div>
+              <form id="form-admin-add-vtr" onsubmit="submitSingleVtr(event)">
+                <div class="form-grid-2">
+                  <div class="field">
+                    <label for="adm-prefixo" class="field-label">Prefixo</label>
+                    <input type="text" id="adm-prefixo" class="input" required placeholder="Ex.: VTR-2301">
+                  </div>
+                  <div class="field">
+                    <label for="adm-modelo" class="field-label">Modelo / Marca</label>
+                    <input type="text" id="adm-modelo" class="input" required placeholder="Ex.: Toyota Hilux 4x4">
+                  </div>
+                  <div class="field">
+                    <label for="adm-placa" class="field-label">Placa</label>
+                    <input type="text" id="adm-placa" class="input" required placeholder="Ex.: JBC4E23">
+                  </div>
+                  <div class="field">
+                    <label for="adm-km" class="field-label">KM Atual</label>
+                    <input type="number" id="adm-km" class="input" min="0" required placeholder="0">
+                  </div>
+                  <div class="field">
+                    <label for="adm-subunidade" class="field-label">Subunidade</label>
+                    <input type="text" id="adm-subunidade" class="input" required placeholder="Ex.: 1ª Cia / Força Tática">
+                  </div>
+                  <div class="field">
+                    <label for="adm-status" class="field-label">Status Inicial</label>
+                    <select id="adm-status" class="select">
+                      <option value="Disponível">Disponível</option>
+                      <option value="Em Patrulhamento">Em Patrulhamento</option>
+                      <option value="Em Viagem">Em Viagem</option>
+                      <option value="Em Manutenção">Em Manutenção</option>
+                      <option value="Baixada">Baixada</option>
+                    </select>
+                  </div>
+                  <div class="field" style="grid-column: 1 / -1;">
+                    <label for="adm-foto-input" class="field-label">Foto da Viatura (Seletor de Arquivos do Dispositivo — Sem Câmera)</label>
+                    <div class="file-drop-box">
+                      <input type="file" id="adm-foto-input" accept="image/jpeg,image/png,image/webp" onchange="handleAdminPhotoSelect(event)">
+                      <div id="adm-foto-meta" class="galope-desc">Redimensionamento automático (máx. 640px) e compressão JPEG antes de salvar.</div>
+                      <div id="adm-foto-preview-wrap" class="photo-preview-box is-hidden">
+                        <img id="adm-foto-preview-img" src="" alt="Pré-visualização da viatura">
+                        <div>
+                          <div id="adm-foto-stats" class="data-label" style="color: var(--positive);"></div>
+                          <button type="button" class="btn btn-sm" style="margin-top: var(--space-xs);" onclick="clearAdminPhotoSelection()">Remover Foto</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="adm-add-msg" style="margin-top: var(--space-md);"></div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">
+                    <i data-lucide="plus" aria-hidden="true"></i>
+                    <span>Cadastrar Viatura</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Importação em Lote via Planilha -->
+            <div class="panel">
+              <div class="section-header">
+                <div>
+                  <h3 class="section-title" style="font-size: var(--subhead-size);">Inclusão em Lote (Excel / Google Planilhas)</h3>
+                  <p class="section-desc">Copie as colunas da planilha na ordem: Prefixo, Modelo, Placa, KM Atual e Subunidade, e cole abaixo.</p>
+                </div>
+              </div>
+              <div class="field">
+                <label for="adm-batch-text" class="field-label">Colar Dados da Planilha (Separados por TAB, ; ou ,)</label>
+                <textarea id="adm-batch-text" class="textarea" style="min-height: 140px; font-family: var(--font-label); font-size: 0.84rem;" placeholder="Exemplo de linhas coladas do Excel:&#10;VTR-2301&#9;Toyota Corolla Cross&#9;JBC1A23&#9;18450&#9;1ª Cia&#10;VTR-2302&#9;Chevrolet Trailblazer&#9;JBC2B23&#9;42100&#9;Força Tática" oninput="parseBatchPreview()"></textarea>
+              </div>
+              <div class="form-actions" style="margin-top: var(--space-sm);">
+                <button type="button" class="btn btn-sm" onclick="parseBatchPreview()">
+                  <i data-lucide="scan-line" aria-hidden="true"></i>
+                  <span>Atualizar Pré-visualização</span>
+                </button>
+                <button type="button" class="btn btn-sm" onclick="clearBatchArea()">Limpar Área</button>
+              </div>
+
+              <div id="batch-preview-wrap" class="is-hidden" style="margin-top: var(--space-md); display: grid; gap: var(--space-sm);">
+                <div id="batch-preview-summary" class="data-label"></div>
+                <div class="table-scroll" style="max-height: 240px;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Prefixo</th>
+                        <th>Modelo</th>
+                        <th>Placa</th>
+                        <th>KM</th>
+                        <th>Subunidade</th>
+                        <th>Situação</th>
+                      </tr>
+                    </thead>
+                    <tbody id="batch-preview-tbody"></tbody>
+                  </table>
+                </div>
+                <div>
+                  <button type="button" id="btn-confirm-batch" class="btn btn-success" onclick="confirmBatchImport()">
+                    <i data-lucide="upload" aria-hidden="true"></i>
+                    <span>Confirmar Inclusão em Lote</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gestão e Exclusão de Viaturas Cadastradas -->
+          <div class="panel">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title" style="font-size: var(--subhead-size);">Frota Cadastrada — Controle Administrativo e Fotos</h3>
+                <p class="section-desc">Altere status manualmente, atualize fotos do armazenamento do dispositivo, resolva partes pendentes ou exclua viaturas.</p>
+              </div>
+            </div>
+            <!-- Input oculto exclusivo para troca rápida de foto de viatura existente (sem câmera) -->
+            <input type="file" id="adm-row-photo-input" class="is-hidden" accept="image/jpeg,image/png,image/webp" onchange="handleRowPhotoChange(event)">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Foto</th>
+                    <th>Prefixo</th>
+                    <th>Modelo / Placa</th>
+                    <th>Subunidade</th>
+                    <th>KM Atual</th>
+                    <th>Status</th>
+                    <th>Ações P4</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-vtrs-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Integração com Supabase (Nuvem) + Script SQL -->
+          <div class="panel" id="admin-supabase-panel">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title" style="font-size: var(--subhead-size);">Integração em Nuvem — Supabase</h3>
+                <p class="section-desc">Funciona integralmente em Modo Local quando não configurado. Informe URL e Chave Anon para ativar a sincronização em nuvem.</p>
+              </div>
+              <span id="adm-sync-badge" class="status-badge status-viag">Modo Local</span>
+            </div>
+
+            <div class="split-grid">
+              <div>
+                <form id="form-supabase-config" onsubmit="saveSupabaseConfig(event)">
+                  <div class="field">
+                    <label for="sb-url" class="field-label">SUPABASE_URL</label>
+                    <input type="text" id="sb-url" class="input" placeholder="Ex.: seuprojeto.supabase.co">
+                  </div>
+                  <div class="field" style="margin-top: var(--space-md);">
+                    <label for="sb-key" class="field-label">SUPABASE_ANON_KEY</label>
+                    <input type="password" id="sb-key" class="input" placeholder="Cole aqui sua chave pública anon (eyJ...)">
+                  </div>
+                  <div id="sb-config-msg" style="margin-top: var(--space-md);"></div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                      <i data-lucide="cloud" aria-hidden="true"></i>
+                      <span>Salvar e Sincronizar</span>
+                    </button>
+                    <button type="button" class="btn" onclick="pullFromSupabase()">
+                      <i data-lucide="refresh-cw" aria-hidden="true"></i>
+                      <span>Baixar da Nuvem</span>
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="disconnectSupabase()">
+                      <span>Usar Modo Local</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-bottom: var(--space-sm);">
+                  <span class="data-label">Script SQL — Tabela Supabase</span>
+                  <button type="button" id="btn-copy-sql" class="btn btn-sm" onclick="copySupabaseSql()">
+                    <i data-lucide="copy" aria-hidden="true"></i>
+                    <span>Copiar SQL</span>
+                  </button>
+                </div>
+                <pre id="supabase-sql-code" class="sql-block">-- Execute no SQL Editor do Supabase
+CREATE TABLE IF NOT EXISTS public.frota_23bpm (
+  id TEXT PRIMARY KEY,
+  categoria TEXT NOT NULL,
+  dados JSONB NOT NULL,
+  atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_frota_23bpm_cat
+  ON public.frota_23bpm (categoria);
+
+ALTER TABLE public.frota_23bpm ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Acesso Frota 23BPM" ON public.frota_23bpm;
+CREATE POLICY "Acesso Frota 23BPM"
+  ON public.frota_23bpm
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Rodapé Limpo Institucional -->
+    <footer class="bpm-footer">
+      23º Batalhão de Polícia Militar • Gestão de Frota e Prontidão Operacional
+    </footer>
+  </div>
+
+  <!-- Modal de Visualização de Anexo -->
+  <div id="attachment-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-attachment-title">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <h3 id="modal-attachment-title" class="section-title" style="font-size: var(--subhead-size);">Visualização de Anexo</h3>
+        <button type="button" class="btn btn-sm" onclick="closeAttachmentModal()">Fechar</button>
+      </div>
+      <div id="modal-attachment-body" class="modal-body"></div>
+      <div class="modal-foot">
+        <button type="button" id="modal-download-btn" class="btn btn-primary" onclick="downloadModalAttachment()">
+          <i data-lucide="download" aria-hidden="true"></i>
+          <span>Baixar Arquivo</span>
+        </button>
+        <button type="button" class="btn" onclick="closeAttachmentModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Região de Toasts -->
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+
+  <api-shim></api-shim>
+  <script>
+    /* =========================================================================
+       CONFIGURAÇÃO SUPABASE NO CÓDIGO-FONTE (Opcional — Vazio = Modo Local)
+       ========================================================================= */
+    const SUPABASE_CONFIG = {
+      url: '',
+      anonKey: '',
+      table: 'frota_23bpm'
+    };
+
+    const ADMIN_PASSWORD = `P423BPM@2026`;
+
+    const STATUS_LIST = [
+      `Disponível`,
+      `Em Patrulhamento`,
+      `Em Viagem`,
+      `Em Manutenção`,
+      `Baixada`
+    ];
+
+    const GALOPE_ITEMS = [
+      { key: `G`, title: `Gasolina / Combustível`, desc: `Nível do tanque, cartão corporativo de abastecimento e tampa` },
+      { key: `A`, title: `Água / Arrefecimento`, desc: `Nível do radiador, reservatório de expansão e limpador de para-brisa` },
+      { key: `L`, title: `Luzes e Sinalização`, desc: `Faróis, lanternas, setas, luz de freio, giroflex e sirene` },
+      { key: `O`, title: `Óleo do Motor`, desc: `Nível e aspecto do óleo lubrificante e fluido de freio` },
+      { key: `P`, title: `Pneus e Rodas`, desc: `Calibragem, sulcos/TWI, parafusos de fixação e desgaste` },
+      { key: `E`, title: `Equipamentos e Estepe`, desc: `Estepe, macaco, chave de roda, rádio transceptor e compartimento` }
+    ];
+
+    /* =========================================================================
+       ESTADO DA APLICAÇÃO (Base limpa pronta para dados reais)
+       ========================================================================= */
+    let appState = {
+      viaturas: [],
+      cautelas: [],
+      partes: [],
+      supabase: {
+        url: SUPABASE_CONFIG.url,
+        anonKey: SUPABASE_CONFIG.anonKey
+      }
+    };
+
+    /* Cache em memória para mídias pesadas (fotos comprimidas e anexos PDF/IMG)
+       não enviadas ao setAppState do shim para respeitar limite de payload */
+    const sessionMediaMap = new Map();
+
+    let currentView = `dashboard`;
+    let currentStatusFilter = `Todas`;
+    let currentCautelaMode = `cautela`;
+    let adminUnlocked = false;
+    let pendingAdminPhoto = null;
+    let pendingRowPhotoVtrId = null;
+    let pendingParteAttachment = null;
+    let parsedBatchRows = [];
+    let activeModalAttachment = null;
+    let galopeState = {};
+    let syncState = `local`; // 'local' | 'syncing' | 'synced' | 'error'
+
+    function resetGalopeDefaults() {
+      galopeState = {};
+      GALOPE_ITEMS.forEach(item => {
+        galopeState[item.key] = `OK`;
+      });
+    }
+
+    /* =========================================================================
+       CLIENTE SUPABASE REST v1 (Compatível com Supabase PostgREST / JS)
+       ========================================================================= */
+    function normalizeSupabaseUrl(raw) {
+      const trimmed = String(raw || ``).trim().replace(/\/+$/, ``);
+      if (!trimmed) return ``;
+      if (trimmed.startsWith(`https://`) || trimmed.startsWith(`http://`)) return trimmed;
+      return `https://` + trimmed;
+    }
+
+    function createSupabaseRestClient(url, anonKey) {
+      const baseUrl = normalizeSupabaseUrl(url);
+      const key = String(anonKey || ``).trim();
+      if (!baseUrl || !key) return null;
+
+      return {
+        from(table) {
+          const endpoint = `${baseUrl}/rest/v1/${table}`;
+          const baseHeaders = {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': `application/json`
+          };
+          return {
+            async selectAll() {
+              const res = await fetch(`${endpoint}?select=*`, {
+                method: `GET`,
+                headers: baseHeaders
+              });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              return await res.json();
+            },
+            async upsertRows(rows) {
+              if (!rows.length) return [];
+              const res = await fetch(endpoint, {
+                method: `POST`,
+                headers: {
+                  ...baseHeaders,
+                  'Prefer': `resolution=merge-duplicates,return=minimal`
+                },
+                body: JSON.stringify(rows)
+              });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              return true;
+            },
+            async deleteById(id) {
+              const res = await fetch(`${endpoint}?id=eq.${encodeURIComponent(id)}`, {
+                method: `DELETE`,
+                headers: baseHeaders
+              });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              return true;
+            }
+          };
+        }
+      };
+    }
+
+    function getActiveSupabaseClient() {
+      const url = appState.supabase && appState.supabase.url ? appState.supabase.url : https://kgndychimclxxfgyfnic.supabase.co;
+      const key = appState.supabase && appState.supabase.anonKey ? appState.supabase.anonKey : sb_publishable_9F0aTkbqsR6464YIhmSwww_sYaDmjco;
+      return createSupabaseRestClient(url, key);
+    }
+
+    function updateSyncIndicatorUI(status, customLabel) {
+      syncState = status;
+      const pill = document.getElementById(`btn-sync-indicator`);
+      const textEl = document.getElementById(`sync-status-text`);
+      const admBadge = document.getElementById(`adm-sync-badge`);
+
+      if (pill) {
+        pill.classList.remove(`is-synced`, `is-error`, `is-syncing`);
+        if (status === `synced`) pill.classList.add(`is-synced`);
+        if (status === `error`) pill.classList.add(`is-error`);
+        if (status === `syncing`) pill.classList.add(`is-syncing`);
+      }
+
+      const labelMap = {
+        local: `Modo Local`,
+        syncing: `Sincronizando…`,
+        synced: `Sincronizado`,
+        error: `Falha na Nuvem (Local)`
+      };
+      const label = customLabel || labelMap[status] || `Modo Local`;
+      if (textEl) textEl.textContent = label;
+
+      if (admBadge) {
+        admBadge.className = `status-badge ` + (
+          status === `synced` ? `status-disp` :
+          status === `error` ? `status-baix` :
+          status === `syncing` ? `status-patr` : `status-viag`
+        );
+        admBadge.textContent = label;
+      }
+    }
+
+    async function pushAllToSupabase() {
+      const client = getActiveSupabaseClient();
+      if (!client) {
+        updateSyncIndicatorUI(`local`);
+        return false;
+      }
+      updateSyncIndicatorUI(`syncing`);
+      try {
+        const now = new Date().toISOString();
+        const rows = [];
+        appState.viaturas.forEach(v => {
+          const fotoUrl = sessionMediaMap.get(`vtr:${v.id}`) || ``;
+          const payload = { ...v, fotoDataUrl: fotoUrl && fotoUrl.length < 180000 ? fotoUrl : `` };
+          rows.push({ id: `vtr:${v.id}`, categoria: `viatura`, dados: payload, atualizado_em: now });
+        });
+        appState.cautelas.forEach(c => {
+          rows.push({ id: `cautela:${c.id}`, categoria: `cautela`, dados: c, atualizado_em: now });
+        });
+        appState.partes.forEach(p => {
+          const anexoUrl = sessionMediaMap.get(`parte:${p.id}`) || ``;
+          const payload = { ...p, anexoDataUrl: anexoUrl && anexoUrl.length < 250000 ? anexoUrl : `` };
+          rows.push({ id: `parte:${p.id}`, categoria: `parte`, dados: payload, atualizado_em: now });
+        });
+        if (rows.length > 0) {
+          await client.from(SUPABASE_CONFIG.table).upsertRows(rows);
+        }
+        updateSyncIndicatorUI(`synced`);
+        return true;
+      } catch (err) {
+        updateSyncIndicatorUI(`error`);
+        return false;
+      }
+    }
+
+    async function pullFromSupabase() {
+      const client = getActiveSupabaseClient();
+      if (!client) {
+        updateSyncIndicatorUI(`local`);
+        showToast(`Configure SUPABASE_URL e SUPABASE_ANON_KEY para sincronizar.`, `warn`);
+        return false;
+      }
+      updateSyncIndicatorUI(`syncing`);
+      try {
+        const rows = await client.from(SUPABASE_CONFIG.table).selectAll();
+        const vtrs = [];
+        const cautelas = [];
+        const partes = [];
+        if (Array.isArray(rows)) {
+          rows.forEach(row => {
+            if (!row || !row.dados) return;
+            if (row.categoria === `viatura`) {
+              const v = { ...row.dados };
+              if (v.fotoDataUrl) {
+                sessionMediaMap.set(`vtr:${v.id}`, v.fotoDataUrl);
+                delete v.fotoDataUrl;
+              }
+              vtrs.push(v);
+            } else if (row.categoria === `cautela`) {
+              cautelas.push(row.dados);
+            } else if (row.categoria === `parte`) {
+              const p = { ...row.dados };
+              if (p.anexoDataUrl) {
+                sessionMediaMap.set(`parte:${p.id}`, p.anexoDataUrl);
+                delete p.anexoDataUrl;
+              }
+              partes.push(p);
+            }
+          });
+        }
+        appState.viaturas = vtrs;
+        appState.cautelas = cautelas.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
+        appState.partes = partes.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
+        await persistLocalState();
+        renderAll();
+        updateSyncIndicatorUI(`synced`);
+        showToast(`Dados sincronizados com a nuvem Supabase.`, `success`);
+        return true;
+      } catch (err) {
+        updateSyncIndicatorUI(`error`);
+        showToast(`Não foi possível conectar ao Supabase. Operando em Modo Local.`, `error`);
+        return false;
+      }
+    }
+
+    async function deleteRowInSupabase(rowId) {
+      const client = getActiveSupabaseClient();
+      if (!client) return;
+      try {
+        await client.from(SUPABASE_CONFIG.table).deleteById(rowId);
+      } catch (err) {
+        updateSyncIndicatorUI(`error`);
+      }
+    }
+
+    /* =========================================================================
+       PERSISTÊNCIA SEGURA VIA NOTEBOOK SHIM API (Sem binários no setAppState)
+       ========================================================================= */
+    function buildPersistableState() {
+      return {
+        viaturas: appState.viaturas.map(v => ({
+          id: v.id,
+          prefixo: v.prefixo,
+          modelo: v.modelo,
+          placa: v.placa,
+          kmAtual: Number(v.kmAtual) || 0,
+          subunidade: v.subunidade,
+          status: v.status,
+          hasFoto: Boolean(v.hasFoto),
+          fotoMeta: v.fotoMeta || null,
+          turnoAtivo: v.turnoAtivo || null
+        })),
+        cautelas: appState.cautelas.slice(0, 120),
+        partes: appState.partes.slice(0, 120).map(p => ({
+          id: p.id,
+          vtrId: p.vtrId,
+          prefixo: p.prefixo,
+          militar: p.militar,
+          tipo: p.tipo,
+          relato: p.relato,
+          status: p.status,
+          dataHora: p.dataHora,
+          anexoMeta: p.anexoMeta || null
+        })),
+        supabase: {
+          url: appState.supabase && appState.supabase.url ? appState.supabase.url : ``,
+          anonKey: appState.supabase && appState.supabase.anonKey ? appState.supabase.anonKey : ``
+        }
+      };
+    }
+
+    async function persistLocalState() {
+      if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+        try {
+          await window.notebookAppApi.setAppState(buildPersistableState());
+        } catch (err) {
+          /* Mantém sessão operacional ativa mesmo se shim recusar */
+        }
+      }
+    }
+
+    async function saveAndSync() {
+      await persistLocalState();
+      if (getActiveSupabaseClient()) {
+        await pushAllToSupabase();
+      } else {
+        updateSyncIndicatorUI(`local`);
+      }
+    }
+
+    /* =========================================================================
+       UTILITÁRIOS
+       ========================================================================= */
+    function generateId(prefix) {
+      return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str || ``)
+        .replace(/&/g, `&amp;`)
+        .replace(/</g, `&lt;`)
+        .replace(/>/g, `&gt;`)
+        .replace(/"/g, `&quot;`)
+        .replace(/'/g, `&#39;`);
+    }
+
+    function formatKm(km) {
+      const n = Number(km) || 0;
+      return `${n.toLocaleString(`pt-BR`)} km`;
+    }
+
+    function formatDateTime(iso) {
+      if (!iso) return `—`;
+      try {
+        return new Date(iso).toLocaleString(`pt-BR`, {
+          day: `2-digit`,
+          month: `2-digit`,
+          year: `numeric`,
+          hour: `2-digit`,
+          minute: `2-digit`
+        });
+      } catch (e) {
+        return iso;
+      }
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return `0 KB`;
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / 1048576).toFixed(2)} MB`;
+    }
+
+    function getStatusClass(status) {
+      switch (status) {
+        case `Disponível`: return `status-disp`;
+        case `Em Patrulhamento`: return `status-patr`;
+        case `Em Viagem`: return `status-viag`;
+        case `Em Manutenção`: return `status-manu`;
+        case `Baixada`: return `status-baix`;
+        default: return `status-disp`;
+      }
+    }
+
+    function getPendingPartesCount(vtrId, prefixo) {
+      return appState.partes.filter(p =>
+        p.status === `Pendente` && (p.vtrId === vtrId || (prefixo && p.prefixo === prefixo))
+      ).length;
+    }
+
+    function showToast(message, type) {
+      const region = document.getElementById(`toast-region`);
+      if (!region) return;
+      const el = document.createElement(`div`);
+      el.className = `toast-item ` + (type === `error` ? `is-error` : type === `success` ? `is-success` : type === `warn` ? `is-warn` : ``);
+      el.textContent = message;
+      region.appendChild(el);
+      setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 4200);
+    }
+
+    function setInlineAlert(containerId, message, type) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      if (!message) {
+        el.innerHTML = ``;
+        return;
+      }
+      const cls = type === `error` ? `alert-critical` : type === `success` ? `alert-success` : type === `warn` ? `alert-warn` : `alert-info`;
+      el.innerHTML = `<div class="alert-box ${cls}">${escapeHtml(message)}</div>`;
+    }
+
+    function refreshIcons() {
+      if (window.lucide && typeof window.lucide.createIcons === `function`) {
+        try {
+          window.lucide.createIcons();
+        } catch (e) { /* noop */ }
+      }
+    }
+
+    /* =========================================================================
+       NAVEGAÇÃO ENTRE MÓDULOS
+       ========================================================================= */
+    function switchView(viewName) {
+      currentView = viewName;
+      const views = [`dashboard`, `cautela`, `aux`, `admin`];
+      views.forEach(v => {
+        const sec = document.getElementById(`view-${v}`);
+        const nav = document.getElementById(`nav-${v}`);
+        if (sec) sec.classList.toggle(`is-active`, v === viewName);
+        if (nav) nav.classList.toggle(`is-active`, v === viewName);
+      });
+      renderAll();
+    }
+
+    function handleSyncIndicatorClick() {
+      if (getActiveSupabaseClient()) {
+        pullFromSupabase();
+      } else {
+        switchView(`admin`);
+        const panel = document.getElementById(`admin-supabase-panel`);
+        if (panel && adminUnlocked) {
+          panel.scrollIntoView({ behavior: `smooth` });
+        }
+        showToast(`Configure a conexão Supabase no Modo Administrador (P4).`, `info`);
+      }
+    }
+
+    /* =========================================================================
+       DASHBOARD DE PRONTIDÃO OPERACIONAL
+       ========================================================================= */
+    function setStatusFilter(status) {
+      currentStatusFilter = status;
+      const map = {
+        'Todas': `kpi-todas`,
+        'Disponível': `kpi-disponivel`,
+        'Em Patrulhamento': `kpi-patrulhamento`,
+        'Em Viagem': `kpi-viagem`,
+        'Em Manutenção': `kpi-manutencao`,
+        'Baixada': `kpi-baixada`
+      };
+      Object.keys(map).forEach(key => {
+        const card = document.getElementById(map[key]);
+        if (card) card.classList.toggle(`is-selected`, key === status);
+      });
+      renderDashboard();
+    }
+
+    function updateDashboardKPIs() {
+      const vtrs = appState.viaturas;
+      const counts = {
+        'Todas': vtrs.length,
+        'Disponível': 0,
+        'Em Patrulhamento': 0,
+        'Em Viagem': 0,
+        'Em Manutenção': 0,
+        'Baixada': 0
+      };
+      vtrs.forEach(v => {
+        if (counts[v.status] !== undefined) counts[v.status] += 1;
+      });
+
+      const elTodas = document.getElementById(`count-todas`);
+      const elDisp = document.getElementById(`count-disponivel`);
+      const elPatr = document.getElementById(`count-patrulhamento`);
+      const elViag = document.getElementById(`count-viagem`);
+      const elManu = document.getElementById(`count-manutencao`);
+      const elBaix = document.getElementById(`count-baixada`);
+      const badgeTotal = document.getElementById(`badge-total-vtrs`);
+      const badgePartes = document.getElementById(`badge-partes-pendentes`);
+
+      if (elTodas) elTodas.textContent = counts[`Todas`];
+      if (elDisp) elDisp.textContent = counts[`Disponível`];
+      if (elPatr) elPatr.textContent = counts[`Em Patrulhamento`];
+      if (elViag) elViag.textContent = counts[`Em Viagem`];
+      if (elManu) elManu.textContent = counts[`Em Manutenção`];
+      if (elBaix) elBaix.textContent = counts[`Baixada`];
+      if (badgeTotal) badgeTotal.textContent = counts[`Todas`];
+
+      const pendentesTotal = appState.partes.filter(p => p.status === `Pendente`).length;
+      if (badgePartes) {
+        badgePartes.textContent = pendentesTotal;
+        badgePartes.classList.toggle(`has-alert`, pendentesTotal > 0);
+      }
+
+      /* Atualizar opções de subunidade mantendo seleção atual */
+      const subSelect = document.getElementById(`dash-subunidade`);
+      if (subSelect) {
+        const prev = subSelect.value;
+        const subs = Array.from(new Set(vtrs.map(v => v.subunidade).filter(Boolean))).sort();
+        subSelect.innerHTML = `<option value="">Todas as Subunidades</option>` +
+          subs.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join(``);
+        if (subs.includes(prev)) subSelect.value = prev;
+      }
+    }
+
+    function renderDashboard() {
+      updateDashboardKPIs();
+      const grid = document.getElementById(`dashboard-grid`);
+      const emptyBox = document.getElementById(`dashboard-empty`);
+      const emptyTitle = document.getElementById(`empty-state-title`);
+      const emptyDesc = document.getElementById(`empty-state-desc`);
+      if (!grid || !emptyBox) return;
+
+      const searchEl = document.getElementById(`dash-search`);
+      const subEl = document.getElementById(`dash-subunidade`);
+      const parteEl = document.getElementById(`dash-parte-filter`);
+
+      const query = searchEl ? searchEl.value.trim().toLowerCase() : ``;
+      const subFilter = subEl ? subEl.value : ``;
+      const parteFilter = parteEl ? parteEl.value : ``;
+
+      const filtered = appState.viaturas.filter(v => {
+        if (currentStatusFilter !== `Todas` && v.status !== currentStatusFilter) return false;
+        if (subFilter && v.subunidade !== subFilter) return false;
+        const pend = getPendingPartesCount(v.id, v.prefixo);
+        if (parteFilter === `pendente` && pend === 0) return false;
+        if (query) {
+          const hay = `${v.prefixo} ${v.modelo} ${v.placa} ${v.subunidade}`.toLowerCase();
+          if (!hay.includes(query)) return false;
+        }
+        return true;
+      });
+
+      if (appState.viaturas.length === 0) {
+        grid.innerHTML = ``;
+        emptyBox.classList.remove(`is-hidden`);
+        if (emptyTitle) emptyTitle.textContent = `Base Operacional Limpa`;
+        if (emptyDesc) emptyDesc.textContent = `Nenhuma viatura cadastrada até o momento. Acesse o Modo Administrador (P4) para cadastrar viaturas individualmente ou importar uma planilha em lote.`;
+        return;
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = ``;
+        emptyBox.classList.remove(`is-hidden`);
+        if (emptyTitle) emptyTitle.textContent = `Nenhuma viatura encontrada neste filtro`;
+        if (emptyDesc) emptyDesc.textContent = `Ajuste o status selecionado ou limpe o campo de busca para visualizar as viaturas disponíveis na frota.`;
+        return;
+      }
+
+      emptyBox.classList.add(`is-hidden`);
+
+      grid.innerHTML = filtered.map(v => {
+        const pendCount = getPendingPartesCount(v.id, v.prefixo);
+        const fotoUrl = sessionMediaMap.get(`vtr:${v.id}`);
+        const mediaHtml = fotoUrl
+          ? `<img src="${fotoUrl}" alt="Viatura ${escapeHtml(v.prefixo)}">`
+          : `<div class="vtr-placeholder" aria-hidden="true">
+               <svg width="64" height="36" viewBox="0 0 64 36" fill="none" stroke="currentColor" stroke-width="2">
+                 <path d="M6 24h52v-7l-9-9H18l-8 9H6v7z"/>
+                 <circle cx="17" cy="26" r="5"/>
+                 <circle cx="47" cy="26" r="5"/>
+                 <rect x="27" y="4" width="10" height="4" rx="1"/>
+               </svg>
+               <span class="data-label">${v.hasFoto ? `Foto em Sessão Anterior` : `Sem Foto Cadastrada`}</span>
+             </div>`;
+
+        const parteBadgeHtml = pendCount > 0
+          ? `<button type="button" class="parte-alert-badge" onclick="goToVtrPartes('${escapeHtml(v.id)}')" title="Ver parte de alterações pendente">
+               <span>! Parte Pendente (${pendCount})</span>
+             </button>`
+          : ``;
+
+        const turnHtml = (v.turnoAtivo && (v.status === `Em Patrulhamento` || v.status === `Em Viagem`))
+          ? `<div class="vtr-active-turn">
+               <span class="data-label">Em Turno Ativo</span>
+               <strong>${escapeHtml(v.turnoAtivo.motorista)}</strong>
+               <span>Setor: ${escapeHtml(v.turnoAtivo.setor)} • Saída: ${formatDateTime(v.turnoAtivo.dataHora)}</span>
+             </div>`
+          : ``;
+
+        let primaryActionHtml = ``;
+        if (v.status === `Disponível`) {
+          primaryActionHtml = `<button type="button" class="btn btn-primary btn-sm" onclick="quickStartCautela('${escapeHtml(v.id)}')">Cautelar VTR</button>`;
+        } else if (v.status === `Em Patrulhamento` || v.status === `Em Viagem`) {
+          primaryActionHtml = `<button type="button" class="btn btn-success btn-sm" onclick="quickStartDescautela('${escapeHtml(v.id)}')">Descautelar</button>`;
+        } else {
+          primaryActionHtml = `<button type="button" class="btn btn-sm" disabled>Indisponível para Cautela</button>`;
+        }
+
+        return `
+          <div class="vtr-card-wrap">
+            <article class="vtr-card ${pendCount > 0 ? `has-parte` : ``}">
+              <div class="vtr-media">
+                ${mediaHtml}
+                <div class="vtr-media-badges">
+                  <span class="status-badge ${getStatusClass(v.status)}">${escapeHtml(v.status)}</span>
+                  ${parteBadgeHtml}
+                </div>
+              </div>
+              <div class="vtr-body">
+                <div>
+                  <div class="vtr-title-row">
+                    <h3 class="vtr-prefix">${escapeHtml(v.prefixo)}</h3>
+                    <span class="vtr-plate">${escapeHtml(v.placa)}</span>
+                  </div>
+                  <p class="vtr-model">${escapeHtml(v.modelo)}</p>
+                </div>
+                <div class="vtr-specs">
+                  <div class="spec-item">
+                    <span class="data-label">Hodômetro</span>
+                    <span class="spec-val">${formatKm(v.kmAtual)}</span>
+                  </div>
+                  <div class="spec-item">
+                    <span class="data-label">Subunidade</span>
+                    <span class="spec-val">${escapeHtml(v.subunidade)}</span>
+                  </div>
+                </div>
+                ${turnHtml}
+              </div>
+              <div class="vtr-actions">
+                ${primaryActionHtml}
+                <button type="button" class="btn btn-sm" onclick="quickStartParte('${escapeHtml(v.id)}')">Parte / Alteração</button>
+              </div>
+            </article>
+          </div>
+        `;
+      }).join(``);
+    }
+
+    /* =========================================================================
+       CAUTELA & DESCAUTELA (DIÁRIO DE BORDO + G.A.L.O.P.E.)
+       ========================================================================= */
+    function setCautelaMode(mode) {
+      currentCautelaMode = mode;
+      const paneC = document.getElementById(`pane-cautela`);
+      const paneD = document.getElementById(`pane-descautela`);
+      const btnC = document.getElementById(`tab-btn-cautela`);
+      const btnD = document.getElementById(`tab-btn-descautela`);
+
+      if (paneC) paneC.classList.toggle(`is-hidden`, mode !== `cautela`);
+      if (paneD) paneD.classList.toggle(`is-hidden`, mode !== `descautela`);
+      if (btnC) btnC.classList.toggle(`is-active`, mode === `cautela`);
+      if (btnD) btnD.classList.toggle(`is-active`, mode === `descautela`);
+    }
+
+    function quickStartCautela(vtrId) {
+      switchView(`cautela`);
+      setCautelaMode(`cautela`);
+      const sel = document.getElementById(`cautela-vtr`);
+      if (sel) {
+        sel.value = vtrId;
+        onCautelaVtrChange();
+      }
+    }
+
+    function quickStartDescautela(vtrId) {
+      switchView(`cautela`);
+      setCautelaMode(`descautela`);
+      const sel = document.getElementById(`descautela-vtr`);
+      if (sel) {
+        sel.value = vtrId;
+        onDescautelaVtrChange();
+      }
+    }
+
+    function goToAvailableVtrs() {
+      switchView(`dashboard`);
+      setStatusFilter(`Disponível`);
+    }
+
+    function renderCautelaSelects() {
+      const selC = document.getElementById(`cautela-vtr`);
+      const selD = document.getElementById(`descautela-vtr`);
+
+      if (selC) {
+        const prev = selC.value;
+        const disponiveis = appState.viaturas.filter(v => v.status === `Disponível`);
+        selC.innerHTML = `<option value="">Selecione uma viatura disponível…</option>` +
+          disponiveis.map(v => `<option value="${escapeHtml(v.id)}">${escapeHtml(v.prefixo)} — ${escapeHtml(v.modelo)} (${formatKm(v.kmAtual)})</option>`).join(``);
+        if (disponiveis.some(v => v.id === prev)) selC.value = prev;
+      }
+
+      if (selD) {
+        const prevD = selD.value;
+        const emTurno = appState.viaturas.filter(v => v.status === `Em Patrulhamento` || v.status === `Em Viagem`);
+        selD.innerHTML = `<option value="">Selecione a viatura para encerrar turno…</option>` +
+          emTurno.map(v => `<option value="${escapeHtml(v.id)}">${escapeHtml(v.prefixo)} — ${escapeHtml(v.modelo)} (${escapeHtml(v.status)})</option>`).join(``);
+        if (emTurno.some(v => v.id === prevD)) selD.value = prevD;
+      }
+    }
+
+    function onCautelaVtrChange() {
+      const sel = document.getElementById(`cautela-vtr`);
+      const kmInput = document.getElementById(`cautela-km-inicial`);
+      const critBox = document.getElementById(`galope-critical-alert`);
+      const submitBtn = document.getElementById(`btn-submit-cautela`);
+      setInlineAlert(`cautela-form-msg`, ``);
+
+      resetGalopeDefaults();
+      renderGalopeChecklist();
+      if (critBox) critBox.classList.add(`is-hidden`);
+      if (submitBtn) submitBtn.disabled = false;
+
+      if (!sel || !sel.value) {
+        if (kmInput) kmInput.value = ``;
+        return;
+      }
+      const vtr = appState.viaturas.find(v => v.id === sel.value);
+      if (vtr && kmInput) {
+        kmInput.value = vtr.kmAtual;
+      }
+    }
+
+    function renderGalopeChecklist() {
+      const container = document.getElementById(`galope-container`);
+      if (!container) return;
+
+      container.innerHTML = GALOPE_ITEMS.map(item => {
+        const val = galopeState[item.key] || `OK`;
+        const isCrit = val === `Avaria Alta / Inoperante`;
+        return `
+          <div class="galope-item ${isCrit ? `is-critical` : ``}">
+            <div class="galope-head">
+              <div>
+                <span class="galope-letter">${item.key}</span>
+                <span class="galope-title">${escapeHtml(item.title)}</span>
+              </div>
+              <span class="galope-desc">${escapeHtml(item.desc)}</span>
+            </div>
+            <div class="galope-options" role="group" aria-label="Inspeção ${escapeHtml(item.title)}">
+              <button type="button" class="galope-opt-btn ${val === `OK` ? `selected-ok` : ``}" onclick="setGalopeOption('${item.key}', 'OK')">OK</button>
+              <button type="button" class="galope-opt-btn ${val === `Avaria Leve / Atenção` ? `selected-warn` : ``}" onclick="setGalopeOption('${item.key}', 'Avaria Leve / Atenção')">Avaria Leve / Atenção</button>
+              <button type="button" class="galope-opt-btn ${val === `Avaria Alta / Inoperante` ? `selected-crit` : ``}" onclick="setGalopeOption('${item.key}', 'Avaria Alta / Inoperante')">Avaria Alta / Inoperante</button>
+            </div>
+          </div>
+        `;
+      }).join(``);
+    }
+
+    async function setGalopeOption(key, value) {
+      galopeState[key] = value;
+      renderGalopeChecklist();
+
+      const hasCritical = Object.values(galopeState).some(v => v === `Avaria Alta / Inoperante`);
+      const critBox = document.getElementById(`galope-critical-alert`);
+      const critMsg = document.getElementById(`galope-critical-msg`);
+      const submitBtn = document.getElementById(`btn-submit-cautela`);
+      const selVtr = document.getElementById(`cautela-vtr`);
+
+      if (hasCritical) {
+        if (submitBtn) submitBtn.disabled = true;
+        if (critBox) critBox.classList.remove(`is-hidden`);
+
+        const vtrId = selVtr ? selVtr.value : ``;
+        const vtr = appState.viaturas.find(v => v.id === vtrId);
+        const criticalKeys = GALOPE_ITEMS.filter(i => galopeState[i.key] === `Avaria Alta / Inoperante`).map(i => `${i.key} (${i.title})`);
+
+        if (vtr && vtr.status !== `Baixada`) {
+          vtr.status = `Baixada`;
+          vtr.turnoAtivo = null;
+          appState.cautelas.unshift({
+            id: generateId(`bloqueio`),
+            tipo: `Bloqueio G.A.L.O.P.E.`,
+            vtrId: vtr.id,
+            prefixo: vtr.prefixo,
+            motorista: (document.getElementById(`cautela-motorista`) && document.getElementById(`cautela-motorista`).value.trim()) || `Não informado`,
+            kmInicial: Number(vtr.kmAtual) || 0,
+            kmFinal: Number(vtr.kmAtual) || 0,
+            kmRodados: 0,
+            itensCriticos: criticalKeys,
+            dataHora: new Date().toISOString()
+          });
+          await saveAndSync();
+          renderDashboard();
+          renderCautelaSelects();
+          renderCautelaHistory();
+          renderAdminTable();
+        }
+
+        if (critMsg) {
+          critMsg.innerHTML = `Bloqueio automático acionado para <strong>${vtr ? escapeHtml(vtr.prefixo) : `a viatura`}</strong> por <strong>Avaria Alta / Inoperante</strong> em: ${escapeHtml(criticalKeys.join(`, `))}. O status foi alterado automaticamente para <strong>Baixada</strong>. Realize a troca imediata por outra viatura disponível.`;
+        }
+        showToast(`Viatura baixada automaticamente por Avaria Alta no G.A.L.O.P.E.!`, `error`);
+      } else {
+        if (submitBtn) submitBtn.disabled = false;
+        if (critBox) critBox.classList.add(`is-hidden`);
+      }
+    }
+
+    async function submitCautela(event) {
+      event.preventDefault();
+      const hasCritical = Object.values(galopeState).some(v => v === `Avaria Alta / Inoperante`);
+      if (hasCritical) {
+        setInlineAlert(`cautela-form-msg`, `Cautela bloqueada devido a item marcado como Avaria Alta / Inoperante.`, `error`);
+        return;
+      }
+
+      const vtrId = document.getElementById(`cautela-vtr`).value;
+      const vtr = appState.viaturas.find(v => v.id === vtrId);
+      if (!vtr) {
+        setInlineAlert(`cautela-form-msg`, `Selecione uma viatura disponível válida.`, `error`);
+        return;
+      }
+      if (vtr.status !== `Disponível`) {
+        setInlineAlert(`cautela-form-msg`, `Esta viatura não está Disponível (Status atual: ${vtr.status}).`, `error`);
+        return;
+      }
+
+      const modalidade = document.getElementById(`cautela-modalidade`).value;
+      const motorista = document.getElementById(`cautela-motorista`).value.trim();
+      const matricula = document.getElementById(`cautela-matricula`).value.trim();
+      const guarnicao = document.getElementById(`cautela-guarnicao`).value.trim();
+      const setor = document.getElementById(`cautela-setor`).value.trim();
+      const kmInicial = Number(document.getElementById(`cautela-km-inicial`).value);
+      const obs = document.getElementById(`cautela-obs`).value.trim();
+
+      if (isNaN(kmInicial) || kmInicial < 0) {
+        setInlineAlert(`cautela-form-msg`, `Informe um odômetro inicial válido.`, `error`);
+        return;
+      }
+
+      const nowIso = new Date().toISOString();
+      const ressalvas = GALOPE_ITEMS.filter(i => galopeState[i.key] !== `OK`).map(i => `${i.key}: ${galopeState[i.key]}`);
+
+      vtr.status = modalidade;
+      vtr.kmAtual = kmInicial;
+      vtr.turnoAtivo = {
+        cautelaId: generateId(`turno`),
+        motorista,
+        matricula,
+        guarnicao,
+        setor,
+        kmInicial,
+        dataHora: nowIso,
+        galope: { ...galopeState }
+      };
+
+      appState.cautelas.unshift({
+        id: vtr.turnoAtivo.cautelaId,
+        tipo: `Cautela (${modalidade})`,
+        vtrId: vtr.id,
+        prefixo: vtr.prefixo,
+        motorista,
+        matricula,
+        guarnicao,
+        setor,
+        kmInicial,
+        obs,
+        ressalvas,
+        dataHora: nowIso
+      });
+
+      await saveAndSync();
+      document.getElementById(`form-cautela`).reset();
+      resetGalopeDefaults();
+      renderAll();
+      setInlineAlert(`cautela-form-msg`, `Cautela registrada com sucesso! ${vtr.prefixo} agora está "${modalidade}".`, `success`);
+      showToast(`Cautela concluída: ${vtr.prefixo} em turno.`, `success`);
+    }
+
+    function onDescautelaVtrChange() {
+      const sel = document.getElementById(`descautela-vtr`);
+      const infoBox = document.getElementById(`descautela-turno-info`);
+      const kmFinalInput = document.getElementById(`descautela-km-final`);
+      setInlineAlert(`descautela-form-msg`, ``);
+
+      if (!sel || !sel.value) {
+        if (infoBox) infoBox.classList.add(`is-hidden`);
+        if (kmFinalInput) kmFinalInput.value = ``;
+        updateKmRodadosPreview();
+        return;
+      }
+
+      const vtr = appState.viaturas.find(v => v.id === sel.value);
+      if (vtr && infoBox) {
+        const t = vtr.turnoAtivo;
+        infoBox.classList.remove(`is-hidden`);
+        infoBox.innerHTML = t
+          ? `<strong>Turno Ativo — ${escapeHtml(vtr.prefixo)}</strong>
+             <div>Condutor: ${escapeHtml(t.motorista)} (${escapeHtml(t.matricula || `—`)}) • Setor: ${escapeHtml(t.setor)}</div>
+             <div>Saída: ${formatDateTime(t.dataHora)} • Odômetro Inicial: <strong>${formatKm(t.kmInicial)}</strong></div>`
+          : `<strong>${escapeHtml(vtr.prefixo)}</strong> — Odômetro Atual: <strong>${formatKm(vtr.kmAtual)}</strong>`;
+        if (kmFinalInput) {
+          kmFinalInput.min = t ? t.kmInicial : vtr.kmAtual;
+          kmFinalInput.value = ``;
+        }
+      }
+      updateKmRodadosPreview();
+    }
+
+    function updateKmRodadosPreview() {
+      const sel = document.getElementById(`descautela-vtr`);
+      const kmFinalEl = document.getElementById(`descautela-km-final`);
+      const deltaEl = document.getElementById(`descautela-km-delta`);
+      const detailEl = document.getElementById(`descautela-km-detail`);
+      if (!deltaEl || !detailEl) return;
+
+      if (!sel || !sel.value) {
+        deltaEl.textContent = `— km`;
+        detailEl.textContent = `Selecione a viatura e informe o odômetro final`;
+        return;
+      }
+
+      const vtr = appState.viaturas.find(v => v.id === sel.value);
+      if (!vtr) return;
+      const kmInicial = vtr.turnoAtivo ? Number(vtr.turnoAtivo.kmInicial) : Number(vtr.kmAtual);
+      const kmFinalRaw = kmFinalEl ? kmFinalEl.value : ``;
+
+      if (kmFinalRaw === ``) {
+        deltaEl.textContent = `— km`;
+        detailEl.textContent = `Odômetro inicial de referência: ${formatKm(kmInicial)}`;
+        return;
+      }
+
+      const kmFinal = Number(kmFinalRaw);
+      const rodados = kmFinal - kmInicial;
+      if (rodados < 0) {
+        deltaEl.textContent = `Inválido`;
+        detailEl.textContent = `O odômetro final (${formatKm(kmFinal)}) não pode ser menor que o inicial (${formatKm(kmInicial)}).`;
+      } else {
+        deltaEl.textContent = `+ ${rodados.toLocaleString(`pt-BR`)} km`;
+        detailEl.textContent = `De ${formatKm(kmInicial)} até ${formatKm(kmFinal)}`;
+      }
+    }
+
+    async function submitDescautela(event) {
+      event.preventDefault();
+      const vtrId = document.getElementById(`descautela-vtr`).value;
+      const vtr = appState.viaturas.find(v => v.id === vtrId);
+      if (!vtr) {
+        setInlineAlert(`descautela-form-msg`, `Selecione uma viatura em turno.`, `error`);
+        return;
+      }
+
+      const kmInicial = vtr.turnoAtivo ? Number(vtr.turnoAtivo.kmInicial) : Number(vtr.kmAtual);
+      const kmFinal = Number(document.getElementById(`descautela-km-final`).value);
+      if (isNaN(kmFinal) || kmFinal < kmInicial) {
+        setInlineAlert(`descautela-form-msg`, `O odômetro final deve ser maior ou igual ao odômetro inicial (${formatKm(kmInicial)}).`, `error`);
+        return;
+      }
+
+      const kmRodados = kmFinal - kmInicial;
+      const statusRetorno = document.getElementById(`descautela-status-retorno`).value;
+      const litros = Number(document.getElementById(`descautela-abastecimento`).value) || 0;
+      const obs = document.getElementById(`descautela-obs`).value.trim();
+
+      const motorista = vtr.turnoAtivo ? vtr.turnoAtivo.motorista : `Não informado`;
+      vtr.kmAtual = kmFinal;
+      vtr.status = statusRetorno;
+      vtr.turnoAtivo = null;
+
+      appState.cautelas.unshift({
+        id: generateId(`descautela`),
+        tipo: `Descautela (${statusRetorno})`,
+        vtrId: vtr.id,
+        prefixo: vtr.prefixo,
+        motorista,
+        kmInicial,
+        kmFinal,
+        kmRodados,
+        litros,
+        obs,
+        dataHora: new Date().toISOString()
+      });
+
+      await saveAndSync();
+      document.getElementById(`form-descautela`).reset();
+      const infoBox = document.getElementById(`descautela-turno-info`);
+      if (infoBox) infoBox.classList.add(`is-hidden`);
+      updateKmRodadosPreview();
+      renderAll();
+      setInlineAlert(`descautela-form-msg`, `Descautela concluída para ${vtr.prefixo}. Total percorrido no turno: ${kmRodados.toLocaleString(`pt-BR`)} km.`, `success`);
+      showToast(`Descautela salva: +${kmRodados.toLocaleString(`pt-BR`)} km rodados.`, `success`);
+    }
+
+    function renderCautelaHistory() {
+      const container = document.getElementById(`cautela-history-list`);
+      if (!container) return;
+
+      if (appState.cautelas.length === 0) {
+        container.innerHTML = `<div class="history-card"><span class="galope-desc">Nenhuma cautela ou descautela registrada ainda.</span></div>`;
+        return;
+      }
+
+      container.innerHTML = appState.cautelas.slice(0, 20).map(item => {
+        const isBloqueio = item.tipo && item.tipo.includes(`Bloqueio`);
+        const isDescautela = item.tipo && item.tipo.startsWith(`Descautela`);
+        const badgeCls = isBloqueio ? `status-baix` : isDescautela ? `status-disp` : `status-patr`;
+
+        const kmBadge = isDescautela
+          ? `<span class="vtr-plate" style="color: var(--positive);">+${Number(item.kmRodados || 0).toLocaleString(`pt-BR`)} km rodados</span>`
+          : ``;
+
+        const detailLine = isDescautela
+          ? `KM: ${formatKm(item.kmInicial)} → ${formatKm(item.kmFinal)}${item.litros ? ` • Abast.: ${item.litros} L` : ``}`
+          : isBloqueio
+            ? `Itens reprovados: ${escapeHtml((item.itensCriticos || []).join(`, `))}`
+            : `KM Saída: ${formatKm(item.kmInicial)} • Setor: ${escapeHtml(item.setor || `—`)}`;
+
+        return `
+          <div class="history-card">
+            <div class="history-card-head">
+              <div>
+                <strong>${escapeHtml(item.prefixo)}</strong>
+                <span class="status-badge ${badgeCls}" style="margin-left: 6px;">${escapeHtml(item.tipo)}</span>
+              </div>
+              ${kmBadge}
+            </div>
+            <div class="galope-desc">${escapeHtml(detailLine)}</div>
+            <div class="data-label">${escapeHtml(item.motorista)} • ${formatDateTime(item.dataHora)}</div>
+          </div>
+        `;
+      }).join(``);
+    }
+
+    /* =========================================================================
+       MÓDULO AUXILIAR DE SERVIÇO EXTERNO (PARTES DE ALTERAÇÕES + ANEXO PDF/IMG)
+       ========================================================================= */
+    function renderParteVtrSelect() {
+      const sel = document.getElementById(`parte-vtr`);
+      if (!sel) return;
+      const prev = sel.value;
+      sel.innerHTML = `<option value="">Selecione a viatura…</option>` +
+        appState.viaturas.map(v => `<option value="${escapeHtml(v.id)}">${escapeHtml(v.prefixo)} — ${escapeHtml(v.modelo)} (${escapeHtml(v.status)})</option>`).join(``);
+      if (appState.viaturas.some(v => v.id === prev)) sel.value = prev;
+    }
+
+    function quickStartParte(vtrId) {
+      switchView(`aux`);
+      const sel = document.getElementById(`parte-vtr`);
+      if (sel) sel.value = vtrId;
+    }
+
+    function goToVtrPartes(vtrId) {
+      switchView(`aux`);
+      const filterEl = document.getElementById(`parte-filter-status`);
+      if (filterEl) filterEl.value = `Pendente`;
+      renderPartesHistory();
+    }
+
+    function handleParteFileSelect(event) {
+      const input = event.target;
+      const infoEl = document.getElementById(`parte-arquivo-info`);
+      if (!input || !input.files || !input.files[0]) {
+        pendingParteAttachment = null;
+        if (infoEl) infoEl.textContent = `Nenhum arquivo selecionado. Aceita PDF, JPG ou PNG armazenados no dispositivo.`;
+        return;
+      }
+
+      const file = input.files[0];
+      const allowedTypes = [`application/pdf`, `image/jpeg`, `image/png`];
+      const isAllowed = allowedTypes.includes(file.type) || /\.(pdf|jpe?g|png)$/i.test(file.name);
+      if (!isAllowed) {
+        pendingParteAttachment = null;
+        input.value = ``;
+        if (infoEl) infoEl.textContent = `Formato inválido. Selecione apenas arquivos PDF, JPG ou PNG.`;
+        showToast(`Formato não suportado. Envie PDF, JPG ou PNG.`, `error`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        pendingParteAttachment = {
+          name: file.name,
+          type: file.type || (file.name.toLowerCase().endsWith(`.pdf`) ? `application/pdf` : `image/jpeg`),
+          size: file.size,
+          dataUrl: e.target.result
+        };
+        if (infoEl) {
+          infoEl.textContent = `Anexo pronto: ${file.name} (${formatBytes(file.size)})`;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetParteForm() {
+      const form = document.getElementById(`form-parte`);
+      if (form) form.reset();
+      pendingParteAttachment = null;
+      const infoEl = document.getElementById(`parte-arquivo-info`);
+      if (infoEl) infoEl.textContent = `Nenhum arquivo selecionado. Aceita PDF, JPG ou PNG armazenados no dispositivo.`;
+      setInlineAlert(`parte-form-msg`, ``);
+    }
+
+    async function submitParte(event) {
+      event.preventDefault();
+      const vtrId = document.getElementById(`parte-vtr`).value;
+      const vtr = appState.viaturas.find(v => v.id === vtrId);
+      if (!vtr) {
+        setInlineAlert(`parte-form-msg`, `Cadastre e selecione uma viatura válida para registrar a parte.`, `error`);
+        return;
+      }
+
+      const militar = document.getElementById(`parte-militar`).value.trim();
+      const tipo = document.getElementById(`parte-tipo`).value;
+      const relato = document.getElementById(`parte-relato`).value.trim();
+
+      const parteId = generateId(`parte`);
+      let anexoMeta = null;
+      if (pendingParteAttachment) {
+        sessionMediaMap.set(`parte:${parteId}`, pendingParteAttachment.dataUrl);
+        anexoMeta = {
+          name: pendingParteAttachment.name,
+          type: pendingParteAttachment.type,
+          size: pendingParteAttachment.size
+        };
+      }
+
+      appState.partes.unshift({
+        id: parteId,
+        vtrId: vtr.id,
+        prefixo: vtr.prefixo,
+        militar,
+        tipo,
+        relato,
+        status: `Pendente`,
+        dataHora: new Date().toISOString(),
+        anexoMeta
+      });
+
+      await saveAndSync();
+      resetParteForm();
+      renderAll();
+      setInlineAlert(`parte-form-msg`, `Parte de Alterações registrada para ${vtr.prefixo}. Selo de alerta ativado no card da viatura.`, `success`);
+      showToast(`Parte registrada para ${vtr.prefixo}.`, `success`);
+    }
+
+    function renderPartesHistory() {
+      const container = document.getElementById(`partes-history-list`);
+      if (!container) return;
+
+      const filterEl = document.getElementById(`parte-filter-status`);
+      const filterStatus = filterEl ? filterEl.value : ``;
+
+      const list = appState.partes.filter(p => !filterStatus || p.status === filterStatus);
+      if (list.length === 0) {
+        container.innerHTML = `<div class="history-card"><span class="galope-desc">Nenhuma Parte de Alterações registrada neste filtro.</span></div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(p => {
+        const isPend = p.status === `Pendente`;
+        const dataUrl = sessionMediaMap.get(`parte:${p.id}`);
+        let anexoBtns = ``;
+        if (p.anexoMeta) {
+          if (dataUrl) {
+            anexoBtns = `
+              <button type="button" class="btn btn-sm" onclick="openAttachmentModal('${escapeHtml(p.id)}')">Visualizar (${escapeHtml(p.anexoMeta.name)})</button>
+              <button type="button" class="btn btn-primary btn-sm" onclick="downloadParteAttachment('${escapeHtml(p.id)}')">Baixar Anexo</button>
+            `;
+          } else {
+            anexoBtns = `<span class="galope-desc">Anexo (${escapeHtml(p.anexoMeta.name)}) disponível apenas na sessão de envio ou via nuvem Supabase.</span>`;
+          }
+        }
+
+        const resolveBtn = (adminUnlocked && isPend)
+          ? `<button type="button" class="btn btn-success btn-sm" onclick="resolveParte('${escapeHtml(p.id)}')">Marcar como Resolvida</button>`
+          : ``;
+
+        return `
+          <div class="history-card">
+            <div class="history-card-head">
+              <div>
+                <strong>${escapeHtml(p.prefixo)}</strong>
+                <span class="status-badge ${isPend ? `status-baix` : `status-disp`}" style="margin-left: 6px;">${escapeHtml(p.status)}</span>
+              </div>
+              <span class="data-label">${formatDateTime(p.dataHora)}</span>
+            </div>
+            <div><strong>${escapeHtml(p.tipo)}</strong> — por ${escapeHtml(p.militar)}</div>
+            <div style="color: var(--on-surface-variant); font-size: 0.9rem;">${escapeHtml(p.relato)}</div>
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center;">
+              ${anexoBtns}
+              ${resolveBtn}
+            </div>
+          </div>
+        `;
+      }).join(``);
+    }
+
+    async function resolveParte(parteId) {
+      if (!adminUnlocked) return;
+      const p = appState.partes.find(item => item.id === parteId);
+      if (!p) return;
+      p.status = `Resolvida`;
+      await saveAndSync();
+      renderAll();
+      showToast(`Parte da ${p.prefixo} marcada como Resolvida.`, `success`);
+    }
+
+    function dataUrlToBlob(dataUrl) {
+      const parts = dataUrl.split(`,`);
+      const mimeMatch = parts[0].match(/:(.*?);/);
+      const mime = mimeMatch ? mimeMatch[1] : `application/octet-stream`;
+      const binary = atob(parts[1]);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+      return new Blob([bytes], { type: mime });
+    }
+
+    function openAttachmentModal(parteId) {
+      const p = appState.partes.find(item => item.id === parteId);
+      const dataUrl = sessionMediaMap.get(`parte:${parteId}`);
+      if (!p || !p.anexoMeta || !dataUrl) {
+        showToast(`Arquivo não disponível em memória para visualização.`, `warn`);
+        return;
+      }
+
+      const modal = document.getElementById(`attachment-modal`);
+      const titleEl = document.getElementById(`modal-attachment-title`);
+      const bodyEl = document.getElementById(`modal-attachment-body`);
+      if (!modal || !bodyEl) return;
+
+      activeModalAttachment = { parteId, name: p.anexoMeta.name, type: p.anexoMeta.type, dataUrl };
+      if (titleEl) titleEl.textContent = `${p.prefixo} — ${p.anexoMeta.name}`;
+
+      if (p.anexoMeta.type.startsWith(`image/`)) {
+        bodyEl.innerHTML = `<img src="${dataUrl}" alt="Anexo de ${escapeHtml(p.prefixo)}">`;
+      } else {
+        const blobUrl = URL.createObjectURL(dataUrlToBlob(dataUrl));
+        bodyEl.innerHTML = `<iframe src="${blobUrl}" title="Documento PDF ${escapeHtml(p.anexoMeta.name)}"></iframe>`;
+      }
+
+      modal.classList.add(`is-open`);
+    }
+
+    function closeAttachmentModal() {
+      const modal = document.getElementById(`attachment-modal`);
+      const bodyEl = document.getElementById(`modal-attachment-body`);
+      if (modal) modal.classList.remove(`is-open`);
+      if (bodyEl) bodyEl.innerHTML = ``;
+      activeModalAttachment = null;
+    }
+
+    function downloadModalAttachment() {
+      if (activeModalAttachment) {
+        triggerDownloadFile(activeModalAttachment.dataUrl, activeModalAttachment.name);
+      }
+    }
+
+    function downloadParteAttachment(parteId) {
+      const p = appState.partes.find(item => item.id === parteId);
+      const dataUrl = sessionMediaMap.get(`parte:${parteId}`);
+      if (!p || !p.anexoMeta || !dataUrl) return;
+      triggerDownloadFile(dataUrl, p.anexoMeta.name);
+    }
+
+    function triggerDownloadFile(dataUrl, filename) {
+      const blob = dataUrlToBlob(dataUrl);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement(`a`);
+      a.href = url;
+      a.download = filename || `anexo_23bpm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+
+    /* =========================================================================
+       MODO ADMINISTRADOR (P4) — LOGIN, FOTO COMPRIMIDA, LOTE E SUPABASE
+       ========================================================================= */
+    function unlockAdmin(event) {
+      event.preventDefault();
+      const input = document.getElementById(`admin-password`);
+      const val = input ? input.value : ``;
+      if (val !== ADMIN_PASSWORD) {
+        setInlineAlert(`admin-login-msg`, `Senha incorreta. Acesso ao Modo Administrador negado.`, `error`);
+        return;
+      }
+      adminUnlocked = true;
+      if (input) input.value = ``;
+      setInlineAlert(`admin-login-msg`, ``);
+      updateAdminLockUI();
+      renderAll();
+      showToast(`Modo Administrador (P4) desbloqueado.`, `success`);
+    }
+
+    function lockAdmin() {
+      adminUnlocked = false;
+      updateAdminLockUI();
+      renderAll();
+      showToast(`Modo Administrador bloqueado.`, `info`);
+    }
+
+    function updateAdminLockUI() {
+      const lockScreen = document.getElementById(`admin-lock-screen`);
+      const unlockedBox = document.getElementById(`admin-unlocked-content`);
+      const headerBtn = document.getElementById(`btn-admin-header`);
+      const headerLabel = document.getElementById(`admin-header-label`);
+
+      if (lockScreen) lockScreen.classList.toggle(`is-hidden`, adminUnlocked);
+      if (unlockedBox) unlockedBox.classList.toggle(`is-hidden`, !adminUnlocked);
+      if (headerBtn) headerBtn.classList.toggle(`btn-admin-active`, adminUnlocked);
+      if (headerLabel) headerLabel.textContent = adminUnlocked ? `Admin P4 • Ativo` : `Modo Administrador`;
+
+      if (adminUnlocked) {
+        const sbUrlEl = document.getElementById(`sb-url`);
+        const sbKeyEl = document.getElementById(`sb-key`);
+        if (sbUrlEl) sbUrlEl.value = (appState.supabase && appState.supabase.url) || SUPABASE_CONFIG.url || ``;
+        if (sbKeyEl) sbKeyEl.value = (appState.supabase && appState.supabase.anonKey) || SUPABASE_CONFIG.anonKey || ``;
+      }
+    }
+
+    /* Redimensionamento e Compressão Automática de Imagem no Cliente (Canvas) */
+    function compressImageFile(file, callback) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const maxW = 640;
+          const maxH = 480;
+          let targetW = img.width;
+          let targetH = img.height;
+
+          if (targetW > maxW || targetH > maxH) {
+            const ratio = Math.min(maxW / targetW, maxH / targetH);
+            targetW = Math.round(targetW * ratio);
+            targetH = Math.round(targetH * ratio);
+          }
+
+          const canvas = document.createElement(`canvas`);
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext(`2d`);
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+
+          const compressedDataUrl = canvas.toDataURL(`image/jpeg`, 0.72);
+          const approxBytes = Math.round((compressedDataUrl.length - 23) * 0.75);
+          callback({
+            dataUrl: compressedDataUrl,
+            width: targetW,
+            height: targetH,
+            originalBytes: file.size,
+            compressedBytes: approxBytes
+          });
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleAdminPhotoSelect(event) {
+      const input = event.target;
+      if (!input || !input.files || !input.files[0]) {
+        clearAdminPhotoSelection();
+        return;
+      }
+      const file = input.files[0];
+      compressImageFile(file, result => {
+        pendingAdminPhoto = result;
+        const wrap = document.getElementById(`adm-foto-preview-wrap`);
+        const imgEl = document.getElementById(`adm-foto-preview-img`);
+        const statsEl = document.getElementById(`adm-foto-stats`);
+        if (imgEl) imgEl.src = result.dataUrl;
+        if (statsEl) statsEl.textContent = `${result.width}x${result.height}px • ${formatBytes(result.originalBytes)} → ${formatBytes(result.compressedBytes)}`;
+        if (wrap) wrap.classList.remove(`is-hidden`);
+      });
+    }
+
+    function clearAdminPhotoSelection() {
+      pendingAdminPhoto = null;
+      const input = document.getElementById(`adm-foto-input`);
+      const wrap = document.getElementById(`adm-foto-preview-wrap`);
+      const imgEl = document.getElementById(`adm-foto-preview-img`);
+      if (input) input.value = ``;
+      if (imgEl) imgEl.src = ``;
+      if (wrap) wrap.classList.add(`is-hidden`);
+    }
+
+    async function submitSingleVtr(event) {
+      event.preventDefault();
+      if (!adminUnlocked) return;
+
+      const prefixo = document.getElementById(`adm-prefixo`).value.trim().toUpperCase();
+      const modelo = document.getElementById(`adm-modelo`).value.trim();
+      const placa = document.getElementById(`adm-placa`).value.trim().toUpperCase();
+      const kmAtual = Number(document.getElementById(`adm-km`).value) || 0;
+      const subunidade = document.getElementById(`adm-subunidade`).value.trim();
+      const status = document.getElementById(`adm-status`).value;
+
+      if (appState.viaturas.some(v => v.prefixo.toUpperCase() === prefixo)) {
+        setInlineAlert(`adm-add-msg`, `Já existe uma viatura cadastrada com o prefixo ${prefixo}.`, `error`);
+        return;
+      }
+
+      const vtrId = generateId(`vtr`);
+      let fotoMeta = null;
+      if (pendingAdminPhoto) {
+        sessionMediaMap.set(`vtr:${vtrId}`, pendingAdminPhoto.dataUrl);
+        fotoMeta = {
+          width: pendingAdminPhoto.width,
+          height: pendingAdminPhoto.height,
+          bytes: pendingAdminPhoto.compressedBytes
+        };
+      }
+
+      appState.viaturas.push({
+        id: vtrId,
+        prefixo,
+        modelo,
+        placa,
+        kmAtual,
+        subunidade,
+        status,
+        hasFoto: Boolean(pendingAdminPhoto),
+        fotoMeta,
+        turnoAtivo: null
+      });
+
+      await saveAndSync();
+      document.getElementById(`form-admin-add-vtr`).reset();
+      clearAdminPhotoSelection();
+      renderAll();
+      setInlineAlert(`adm-add-msg`, `Viatura ${prefixo} cadastrada com sucesso.`, `success`);
+      showToast(`Viatura ${prefixo} adicionada à frota.`, `success`);
+    }
+
+    /* Inclusão em Lote de Planilha (Excel / Google Planilhas) */
+    function parseBatchPreview() {
+      const textarea = document.getElementById(`adm-batch-text`);
+      const wrap = document.getElementById(`batch-preview-wrap`);
+      const summary = document.getElementById(`batch-preview-summary`);
+      const tbody = document.getElementById(`batch-preview-tbody`);
+      const confirmBtn = document.getElementById(`btn-confirm-batch`);
+      if (!textarea || !wrap || !tbody) return;
+
+      const raw = textarea.value.trim();
+      if (!raw) {
+        parsedBatchRows = [];
+        wrap.classList.add(`is-hidden`);
+        return;
+      }
+
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const existingPrefixes = new Set(appState.viaturas.map(v => v.prefixo.toUpperCase()));
+      const batchSeen = new Set();
+      parsedBatchRows = [];
+
+      lines.forEach((line, idx) => {
+        let cols = line.split(`\t`);
+        if (cols.length < 2) cols = line.split(`;`);
+        if (cols.length < 2) cols = line.split(`,`);
+        cols = cols.map(c => c.trim());
+
+        /* Ignora linha de cabeçalho se detectada na primeira linha */
+        if (idx === 0 && /prefixo/i.test(cols[0]) && /modelo/i.test(cols[1] || ``)) {
+          return;
+        }
+
+        const prefixo = (cols[0] || ``).toUpperCase();
+        const modelo = cols[1] || ``;
+        const placa = (cols[2] || ``).toUpperCase();
+        const kmDigits = (cols[3] || `0`).replace(/[^\d]/g, ``);
+        const kmAtual = kmDigits ? Number(kmDigits) : 0;
+        const subunidade = cols[4] || `Sede 23º BPM`;
+
+        let valid = true;
+        let reason = `Pronto`;
+        if (!prefixo || !modelo || !placa) {
+          valid = false;
+          reason = `Campos obrigatórios ausentes`;
+        } else if (existingPrefixes.has(prefixo) || batchSeen.has(prefixo)) {
+          valid = false;
+          reason = `Prefixo duplicado`;
+        }
+
+        if (prefixo) batchSeen.add(prefixo);
+        parsedBatchRows.push({ prefixo, modelo, placa, kmAtual, subunidade, valid, reason });
+      });
+
+      const validCount = parsedBatchRows.filter(r => r.valid).length;
+      wrap.classList.remove(`is-hidden`);
+      if (summary) summary.textContent = `${parsedBatchRows.length} linha(s) lida(s) • ${validCount} pronta(s) para cadastro`;
+      if (confirmBtn) confirmBtn.disabled = validCount === 0;
+
+      tbody.innerHTML = parsedBatchRows.map(r => `
+        <tr>
+          <td class="num-cell"><strong>${escapeHtml(r.prefixo || `—`)}</strong></td>
+          <td>${escapeHtml(r.modelo || `—`)}</td>
+          <td class="num-cell">${escapeHtml(r.placa || `—`)}</td>
+          <td class="num-cell">${formatKm(r.kmAtual)}</td>
+          <td>${escapeHtml(r.subunidade)}</td>
+          <td><span class="status-badge ${r.valid ? `status-disp` : `status-baix`}">${escapeHtml(r.reason)}</span></td>
+        </tr>
+      `).join(``);
+    }
+
+    function clearBatchArea() {
+      const textarea = document.getElementById(`adm-batch-text`);
+      const wrap = document.getElementById(`batch-preview-wrap`);
+      if (textarea) textarea.value = ``;
+      if (wrap) wrap.classList.add(`is-hidden`);
+      parsedBatchRows = [];
+    }
+
+    async function confirmBatchImport() {
+      if (!adminUnlocked) return;
+      const toAdd = parsedBatchRows.filter(r => r.valid);
+      if (toAdd.length === 0) return;
+
+      toAdd.forEach(r => {
+        appState.viaturas.push({
+          id: generateId(`vtr`),
+          prefixo: r.prefixo,
+          modelo: r.modelo,
+          placa: r.placa,
+          kmAtual: r.kmAtual,
+          subunidade: r.subunidade,
+          status: `Disponível`,
+          hasFoto: false,
+          fotoMeta: null,
+          turnoAtivo: null
+        });
+      });
+
+      await saveAndSync();
+      clearBatchArea();
+      renderAll();
+      showToast(`${toAdd.length} viatura(s) importada(s) em lote com sucesso!`, `success`);
+    }
+
+    function triggerRowPhotoUpload(vtrId) {
+      if (!adminUnlocked) return;
+      pendingRowPhotoVtrId = vtrId;
+      const input = document.getElementById(`adm-row-photo-input`);
+      if (input) {
+        input.value = ``;
+        input.click();
+      }
+    }
+
+    function handleRowPhotoChange(event) {
+      const input = event.target;
+      if (!input || !input.files || !input.files[0] || !pendingRowPhotoVtrId) return;
+      const vtr = appState.viaturas.find(v => v.id === pendingRowPhotoVtrId);
+      if (!vtr) return;
+
+      compressImageFile(input.files[0], async result => {
+        sessionMediaMap.set(`vtr:${vtr.id}`, result.dataUrl);
+        vtr.hasFoto = true;
+        vtr.fotoMeta = {
+          width: result.width,
+          height: result.height,
+          bytes: result.compressedBytes
+        };
+        pendingRowPhotoVtrId = null;
+        await saveAndSync();
+        renderAll();
+        showToast(`Foto da ${vtr.prefixo} atualizada (${formatBytes(result.compressedBytes)}).`, `success`);
+      });
+    }
+
+    async function adminChangeVtrStatus(vtrId, newStatus) {
+      if (!adminUnlocked) return;
+      const vtr = appState.viaturas.find(v => v.id === vtrId);
+      if (!vtr) return;
+      vtr.status = newStatus;
+      if (newStatus === `Disponível` || newStatus === `Em Manutenção` || newStatus === `Baixada`) {
+        vtr.turnoAtivo = null;
+      }
+      await saveAndSync();
+      renderAll();
+      showToast(`Status da ${vtr.prefixo} alterado para ${newStatus}.`, `info`);
+    }
+
+    async function adminDeleteVtr(btn, vtrId) {
+      if (!adminUnlocked) return;
+      if (btn.dataset.armed !== `true`) {
+        btn.dataset.armed = `true`;
+        btn.textContent = `Confirmar Exclusão`;
+        setTimeout(() => {
+          if (btn && btn.dataset) {
+            btn.dataset.armed = `false`;
+            btn.textContent = `Excluir`;
+          }
+        }, 3500);
+        return;
+      }
+      const vtr = appState.viaturas.find(v => v.id === vtrId);
+      appState.viaturas = appState.viaturas.filter(v => v.id !== vtrId);
+      sessionMediaMap.delete(`vtr:${vtrId}`);
+      await persistLocalState();
+      await deleteRowInSupabase(`vtr:${vtrId}`);
+      renderAll();
+      showToast(`Viatura ${vtr ? vtr.prefixo : ``} excluída da frota.`, `warn`);
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById(`admin-vtrs-tbody`);
+      if (!tbody) return;
+
+      if (appState.viaturas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--on-surface-variant); padding: var(--space-lg);">Nenhuma viatura cadastrada na frota.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = appState.viaturas.map(v => {
+        const fotoUrl = sessionMediaMap.get(`vtr:${v.id}`);
+        const thumb = fotoUrl
+          ? `<img src="${fotoUrl}" alt="${escapeHtml(v.prefixo)}" style="width: 56px; height: 38px; object-fit: cover; border-radius: 4px; display: block;">`
+          : `<span class="data-label">Sem Foto</span>`;
+
+        const statusOptions = STATUS_LIST.map(st =>
+          `<option value="${escapeHtml(st)}" ${v.status === st ? `selected` : ``}>${escapeHtml(st)}</option>`
+        ).join(``);
+
+        return `
+          <tr>
+            <td>${thumb}</td>
+            <td class="num-cell"><strong>${escapeHtml(v.prefixo)}</strong></td>
+            <td>
+              <div>${escapeHtml(v.modelo)}</div>
+              <div class="data-label">${escapeHtml(v.placa)}</div>
+            </td>
+            <td>${escapeHtml(v.subunidade)}</td>
+            <td class="num-cell">${formatKm(v.kmAtual)}</td>
+            <td>
+              <select class="select" aria-label="Alterar status de ${escapeHtml(v.prefixo)}" style="min-height: 36px; padding-top: 4px; padding-bottom: 4px;" onchange="adminChangeVtrStatus('${escapeHtml(v.id)}', this.value)">
+                ${statusOptions}
+              </select>
+            </td>
+            <td>
+              <div style="display: flex; gap: var(--space-xs); flex-wrap: wrap;">
+                <button type="button" class="btn btn-sm" onclick="triggerRowPhotoUpload('${escapeHtml(v.id)}')">Alterar Foto</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="adminDeleteVtr(this, '${escapeHtml(v.id)}')">Excluir</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join(``);
+    }
+
+    /* Configuração Supabase no Painel Admin */
+    async function saveSupabaseConfig(event) {
+      event.preventDefault();
+      if (!adminUnlocked) return;
+      const urlVal = normalizeSupabaseUrl(document.getElementById(`sb-url`).value);
+      const keyVal = document.getElementById(`sb-key`).value.trim();
+
+      if (!urlVal || !keyVal) {
+        setInlineAlert(`sb-config-msg`, `Informe tanto SUPABASE_URL quanto SUPABASE_ANON_KEY.`, `error`);
+        return;
+      }
+
+      appState.supabase = { url: urlVal, anonKey: keyVal };
+      await persistLocalState();
+
+      setInlineAlert(`sb-config-msg`, `Testando conexão com Supabase…`, `info`);
+      const ok = await pushAllToSupabase();
+      if (ok) {
+        await pullFromSupabase();
+        setInlineAlert(`sb-config-msg`, `Conectado e sincronizado com sucesso no Supabase!`, `success`);
+      } else {
+        setInlineAlert(`sb-config-msg`, `Não foi possível alcançar a tabela "${SUPABASE_CONFIG.table}". Verifique URL, Chave Anon e se o Script SQL foi executado no Supabase.`, `error`);
+      }
+    }
+
+    async function disconnectSupabase() {
+      if (!adminUnlocked) return;
+      appState.supabase = { url: ``, anonKey: `` };
+      const sbUrlEl = document.getElementById(`sb-url`);
+      const sbKeyEl = document.getElementById(`sb-key`);
+      if (sbUrlEl) sbUrlEl.value = ``;
+      if (sbKeyEl) sbKeyEl.value = ``;
+      await persistLocalState();
+      updateSyncIndicatorUI(`local`);
+      setInlineAlert(`sb-config-msg`, `Conexão em nuvem desativada. Sistema operando em Modo Local.`, `warn`);
+    }
+
+    function copySupabaseSql() {
+      const pre = document.getElementById(`supabase-sql-code`);
+      const btn = document.getElementById(`btn-copy-sql`);
+      if (!pre) return;
+      const text = pre.textContent;
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === `function`) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`Script SQL copiado para a área de transferência.`, `success`);
+        }).catch(() => {
+          showToast(`Selecione e copie o Script SQL manualmente.`, `info`);
+        });
+      }
+      if (btn) {
+        const prevHtml = btn.innerHTML;
+        btn.textContent = `SQL Copiado!`;
+        setTimeout(() => { btn.innerHTML = prevHtml; refreshIcons(); }, 2000);
+      }
+    }
+
+    /* =========================================================================
+       INICIALIZAÇÃO & RENDERIZAÇÃO GLOBAL
+       ========================================================================= */
+    function renderAll() {
+      renderDashboard();
+      renderCautelaSelects();
+      renderGalopeChecklist();
+      renderCautelaHistory();
+      renderParteVtrSelect();
+      renderPartesHistory();
+      renderAdminTable();
+      refreshIcons();
+    }
+
+    async function initApp() {
+      resetGalopeDefaults();
+      const saved = window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`
+        ? await window.notebookAppApi.getAppState()
+        : null;
+
+      if (saved && typeof saved === `object`) {
+        appState.viaturas = Array.isArray(saved.viaturas) ? saved.viaturas : [];
+        appState.cautelas = Array.isArray(saved.cautelas) ? saved.cautelas : [];
+        appState.partes = Array.isArray(saved.partes) ? saved.partes : [];
+        if (saved.supabase) {
+          appState.supabase = {
+            url: saved.supabase.url || SUPABASE_CONFIG.url,
+            anonKey: saved.supabase.anonKey || SUPABASE_CONFIG.anonKey
+          };
+        }
+      }
+
+      updateAdminLockUI();
+      renderAll();
+
+      if (getActiveSupabaseClient()) {
+        await pullFromSupabase();
+      } else {
+        updateSyncIndicatorUI(`local`);
+      }
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    document.addEventListener(`DOMContentLoaded`, initApp);
+  </script>
+</body>
+</html>
